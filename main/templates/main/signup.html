@@ -1,3 +1,10 @@
-{% csrf_token %}
-{{userForm}}
-{{newStudent}}
+<html>
+<body>
+<form method="post">
+    {% csrf_token %}
+    {{userForm}}
+    {{newStudent}}
+    <button type = "submit">submit</button>
+</form>
+</body>
+</html>
