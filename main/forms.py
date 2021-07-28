@@ -8,13 +8,13 @@ from .models import Customer
 class NewUserForm(UserCreationForm):
 
     class Meta:
-        models = User
+        model = User
         fields = ["username","password1", "password2"]
 
 
 class NewStudentForm(forms.ModelForm):
     class Meta:
-        mdoel = Customer
+        model = Customer
         fields = '__all__'
 
 

@@ -23,6 +23,8 @@ def signup(request):
     
     return render(request,'main/signup.html',{'userForm':userForm,'newStudent':newStudent})
 
+def login(request):
+    return HttpResponse('login page')
 
 def home(request):
     return HttpResponse('hello world')
