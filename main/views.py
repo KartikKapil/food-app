@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth import authenticate, login as auth_login
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -42,7 +43,18 @@ def signup(request):
     return render(request, 'main/signup.html', {'userForm': userForm, 'newStudent': newStudent})
 
 
+@csrf_exempt
 def login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            auth_login(request, user)
+            messages.success(request, f' wecome {username} !!')
+            return JsonResponse({'status': 'success'}, status=200)
+        else:
+            return JsonResponse({'status': 'failure'}, status=403)
     return HttpResponse('login page')
 
 
