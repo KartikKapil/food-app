@@ -12,7 +12,9 @@ class Student(models.Model):
     preferred_restuarnt = models.TextField(null=False)
     preferred_cusine = models.TextField(null=False)
     not_preferred = models.TextField(null=False)
-    upload_mess_menu = models.FileField(upload_to='uploads/%Y/%m/%d')
 
     def __str__(self):
         return self.name
+
+class Document(models.Model):
+    upload_mess_menu = models.FileField(upload_to='uploads/%Y/%m/%d')

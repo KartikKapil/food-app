@@ -19,6 +19,9 @@ class NewStudentForm(forms.ModelForm):
         model = Student
         fields = '__all__'
 
+class Document(forms.Form):
+    menu = forms.FileField(label='Upload the menu')
+
 
 
 

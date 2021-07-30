@@ -5,7 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from .forms import NewStudentForm, NewUserForm
+from .forms import NewStudentForm, NewUserForm, Document
 
 # Create your views here.
 
@@ -14,23 +14,25 @@ from .forms import NewStudentForm, NewUserForm
 def signup(request):
     if request.method == "POST":
         userForm = NewUserForm(request.POST)
-        newStudent = NewStudentForm(request.POST, request.FILES)
+        newStudent = NewStudentForm(request.POST)
+        newDocument = Document(request.POST, request.FILES)
         # Keeing for future debugging, remove when stable
-        #  print("userform non_field_errors: ")
-        #  print(userForm.non_field_errors)
-        #  print("userform field_errors: ")
-        #  print([ (field.value, field.errors) for field in userForm] )
-        #  print("student non_field_errors: ")
-        #  print(userForm.non_field_errors)
-        #  print("student field_errors: ")
-        #  print([ (field.label, field.errors) for field in newStudent] )
-        #  print("data: ")
-        #  print(dict(request.POST))
-        #  print("File: ")
-        #  print(request.FILES)
-        if userForm.is_valid() and newStudent.is_valid():
+        # print("userform non_field_errors: ")
+        # print(userForm.non_field_errors)
+        # print("userform field_errors: ")
+        # print([ (field.value, field.errors) for field in userForm] )
+        # print("student non_field_errors: ")
+        # print(userForm.non_field_errors)
+        # print("student field_errors: ")
+        # print([ (field.label, field.errors) for field in newStudent] )
+        # print("data: ")
+        # print(dict(request.POST))
+        # print("File: ")
+        # print(request.FILES)
+        if userForm.is_valid() and newStudent.is_valid() and newDocument.is_valid():
             userForm.save()
             newStudent.save()
+            newDocument.save()
             user = userForm.cleaned_data.get('username')
             messages.success(request, 'Account was created for ' + user)
             print("saved")
@@ -40,8 +42,9 @@ def signup(request):
     else:
         userForm = NewUserForm()
         newStudent = NewStudentForm()
+        newDocument = Document()
 
-    return render(request, 'main/signup.html', {'userForm': userForm, 'newStudent': newStudent})
+    return render(request, 'main/signup.html', {'userForm': userForm, 'newStudent': newStudent,'newDocument':newDocument})
 
 
 @csrf_exempt
