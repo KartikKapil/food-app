@@ -4,7 +4,7 @@ from django.contrib.auth import login as auth_login
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-
+from .models import *
 from .forms import NewStudentForm, NewUserForm, Document
 
 # Create your views here.
@@ -64,3 +64,9 @@ def login(request):
 
 def home(request):
     return HttpResponse('hello world')
+
+def customer(request,pk_test):
+    student = Student.objects.all()
+    given_student = student.filter(id=pk_test)
+    food_item_not = given_student[0].not_preferred
+    return HttpResponse('a little work left')
