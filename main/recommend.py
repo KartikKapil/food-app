@@ -30,7 +30,7 @@ def recommend(budget: int, spent: int, restrs: List[Dict],
         # Rich buuooy, do recommend something
         restr_budget = ((perc_days + THRESHHOLD_MOD) - mod_perc_budget) * (budget - spent) / 100
         for restr in restrs:
-            if restr.price <= restr_budget:
+            if restr["price"] <= restr_budget:
                 return {"flag": True, "restr": restr}
 
         # Nope, false alarm, you're still poor, go home
@@ -38,3 +38,12 @@ def recommend(budget: int, spent: int, restrs: List[Dict],
     else:
         # You're poor, go home
         return {"flag": False, "restr": None}
+
+
+if __name__ == "__main__":
+    res = recommend(
+        5000, 4000, [{"name": "abc", "price": 120},
+                     {"name": "def", "price": 300}],
+        ["tinda", "lauki"],
+        ["chole", "raita"])
+    print(res)
