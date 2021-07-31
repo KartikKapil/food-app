@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import fields
 
-from .models import Student
+from .models import Document, Student
 
 
 class NewUserForm(UserCreationForm):
@@ -17,10 +17,12 @@ class NewUserForm(UserCreationForm):
 class NewStudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = '__all__'
+        fields = ["name", "address", "phone", "budget", "preferred_restuarnt", "preferred_cusine", "not_preferred"]
 
-class Document(forms.Form):
-    menu = forms.FileField(label='Upload the menu')
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = "__all__"
 
 
 

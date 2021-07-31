@@ -4,8 +4,9 @@ from django.contrib.auth import login as auth_login
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from .models import *
-from .forms import NewStudentForm, NewUserForm, Document
+
+from .forms import DocumentForm, NewStudentForm, NewUserForm
+from .models import Document, Student
 
 # Create your views here.
 
@@ -15,23 +16,41 @@ def signup(request):
     if request.method == "POST":
         userForm = NewUserForm(request.POST)
         newStudent = NewStudentForm(request.POST)
-        newDocument = Document(request.POST, request.FILES)
+        newDocument = DocumentForm(request.POST, request.FILES)
+
         # Keeing for future debugging, remove when stable
-        # print("userform non_field_errors: ")
-        # print(userForm.non_field_errors)
-        # print("userform field_errors: ")
-        # print([ (field.value, field.errors) for field in userForm] )
-        # print("student non_field_errors: ")
-        # print(userForm.non_field_errors)
-        # print("student field_errors: ")
-        # print([ (field.label, field.errors) for field in newStudent] )
-        # print("data: ")
-        # print(dict(request.POST))
-        # print("File: ")
-        # print(request.FILES)
+        #  print("userform non_field_errors: ")
+        #  print(userForm.non_field_errors)
+        #  print("userform field_errors: ")
+        #  print([ (field.value, field.errors) for field in userForm] )
+
+        #  print("student non_field_errors: ")
+        #  print(newStudent.non_field_errors)
+        #  print("student field_errors: ")
+        #  print([ (field.label, field.errors) for field in newStudent] )
+
+        #  print("document non_field_errors: ")
+        #  print(newDocument.non_field_errors)
+        #  print("document field_errors: ")
+        #  print([ (field.label, field.errors) for field in newDocument] )
+
+        #  print("userForm.is_valid(): ")
+        #  print(userForm.is_valid())
+        #  print("newStudent.is_valid(): ")
+        #  print(newStudent.is_valid())
+        #  print("newDocument.is_valid(): ")
+        #  print(newDocument.is_valid())
+
+        #  print("data: ")
+        #  print(dict(request.POST))
+        #  print("File: ")
+        #  print(request.FILES)
+
         if userForm.is_valid() and newStudent.is_valid() and newDocument.is_valid():
-            userForm.save()
-            newStudent.save()
+            user = userForm.save()
+            student = newStudent.save(commit=False)
+            student.user = user
+            student.save()
             newDocument.save()
             user = userForm.cleaned_data.get('username')
             messages.success(request, 'Account was created for ' + user)
@@ -42,9 +61,10 @@ def signup(request):
     else:
         userForm = NewUserForm()
         newStudent = NewStudentForm()
-        newDocument = Document()
+        newDocument = DocumentForm()
 
-    return render(request, 'main/signup.html', {'userForm': userForm, 'newStudent': newStudent,'newDocument':newDocument})
+    return render(request, 'main/signup.html',
+                  {'userForm': userForm, 'newStudent': newStudent, 'newDocument': newDocument})
 
 
 @csrf_exempt
@@ -65,7 +85,8 @@ def login(request):
 def home(request):
     return HttpResponse('hello world')
 
-def customer(request,pk_test):
+
+def customer(request, pk_test):
     student = Student.objects.all()
     given_student = student.filter(id=pk_test)
     food_item_not = given_student[0].not_preferred
