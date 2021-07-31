@@ -9,8 +9,8 @@ class Student(models.Model):
     address = models.CharField(max_length=300)
     phone = models.IntegerField(default=False)
     budget = models.IntegerField(blank=False)
-    preferred_restuarnt = models.TextField(null=False)
-    preferred_cusine = models.TextField(null=False)
+    preferred_restaurants = models.TextField(null=False)
+    preferred_cuisines = models.TextField(null=False)
     not_preferred = models.TextField(null=False)
 
     def __str__(self):

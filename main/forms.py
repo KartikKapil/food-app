@@ -17,7 +17,7 @@ class NewUserForm(UserCreationForm):
 class NewStudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ["name", "address", "phone", "budget", "preferred_restuarnt", "preferred_cusine", "not_preferred"]
+        fields = ["name", "address", "phone", "budget", "preferred_restaurants", "preferred_cuisines", "not_preferred"]
 
 class DocumentForm(forms.ModelForm):
     class Meta:
