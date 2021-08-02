@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import DocumentForm, NewStudentForm, NewUserForm
-from .models import Document, Student
+from .models import *
 
 # Create your views here.
 
@@ -87,7 +87,10 @@ def home(request):
 
 
 def customer(request, pk_test):
-    student = Student.objects.all()
-    given_student = student.filter(id=pk_test)
-    food_item_not = given_student[0].not_preferred
-    return HttpResponse('a little work left')
+    user = User.objects.get(username=pk_test)
+    student_name = user.student.name
+    student_budget = user.student.budget
+    student_preferred_restaurants = user.student.preferred_restaurants
+    student_preferred_cuisines = user.student.preferred_cuisines
+    student_not_preferred = user.student.not_preferred
+    return HttpResponse('a little work left') 

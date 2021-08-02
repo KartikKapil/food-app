@@ -4,7 +4,7 @@ from django.db import models
 # Create your models here.
 
 class Student(models.Model):
-    user  = models.ForeignKey(User,on_delete=models.CASCADE)
+    user  = models.OneToOneField(User,on_delete=models.CASCADE)
     name  = models.CharField(max_length=200)
     address = models.CharField(max_length=300)
     phone = models.IntegerField(default=False)
@@ -17,4 +17,8 @@ class Student(models.Model):
         return self.name
 
 class Document(models.Model):
-    upload_mess_menu = models.FileField(upload_to='uploads/%Y/%m/%d')
+    user  = models.ForeignKey(Student,on_delete=models.CASCADE)
+    Date = models.DateField(auto_now=True)
+    Time = models.TimeField(auto_now=True)
+    food_item_name = models.CharField(max_length=200)
+    # upload_mess_menu = models.FileField(upload_to='uploads/%Y/%m/%d')
