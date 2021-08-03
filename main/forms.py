@@ -20,7 +20,7 @@ class NewStudentForm(forms.ModelForm):
         fields = ["name", "address", "phone", "budget", "preferred_restaurants", "preferred_cuisines", "not_preferred"]
 
 class DocumentForm(forms.Form):
-    title = forms.CharField(max_length=50)
+    # title = forms.CharField(max_length=50)
     file = forms.FileField()
 
 
