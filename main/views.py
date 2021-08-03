@@ -16,7 +16,7 @@ def signup(request):
     if request.method == "POST":
         userForm = NewUserForm(request.POST)
         newStudent = NewStudentForm(request.POST)
-        newDocument = DocumentForm(request.POST, request.FILES)
+        newDocument = DocumentForm(request.POST,request.FILES)
 
         # Keeing for future debugging, remove when stable
         #  print("userform non_field_errors: ")
@@ -31,15 +31,15 @@ def signup(request):
 
         #  print("document non_field_errors: ")
         #  print(newDocument.non_field_errors)
-        #  print("document field_errors: ")
-        #  print([ (field.label, field.errors) for field in newDocument] )
+        # print("document field_errors: ")
+        # print([ (field.label, field.errors) for field in newDocument] )
 
-        #  print("userForm.is_valid(): ")
-        #  print(userForm.is_valid())
-        #  print("newStudent.is_valid(): ")
-        #  print(newStudent.is_valid())
-        #  print("newDocument.is_valid(): ")
-        #  print(newDocument.is_valid())
+        # print("userForm.is_valid(): ")
+        # print(userForm.is_valid())
+        # print("newStudent.is_valid(): ")
+        # print(newStudent.is_valid())
+        # print("newDocument.is_valid(): ")
+        # print(newDocument.is_valid())
 
         #  print("data: ")
         #  print(dict(request.POST))
@@ -51,7 +51,7 @@ def signup(request):
             student = newStudent.save(commit=False)
             student.user = user
             student.save()
-            newDocument.save()
+            # newDocument.save()
             user = userForm.cleaned_data.get('username')
             messages.success(request, 'Account was created for ' + user)
             print("saved")

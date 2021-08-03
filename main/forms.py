@@ -19,11 +19,9 @@ class NewStudentForm(forms.ModelForm):
         model = Student
         fields = ["name", "address", "phone", "budget", "preferred_restaurants", "preferred_cuisines", "not_preferred"]
 
-class DocumentForm(forms.ModelForm):
-    class Meta:
-        model = Document
-        fields = "__all__"
-
+class DocumentForm(forms.Form):
+    title = forms.CharField(max_length=50)
+    file = forms.FileField()
 
 
 
