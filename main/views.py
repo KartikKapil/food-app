@@ -6,7 +6,8 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import DocumentForm, NewStudentForm, NewUserForm
-from .models import *
+from .models import User, Document
+from .recommend import recommend
 import csv
 # Create your views here.
 
@@ -114,11 +115,20 @@ def home(request):
     return HttpResponse('hello world')
 
 
-def customer(request, pk_test):
+def recommend(request, pk_test):
+    # Fetch the required data
     user = User.objects.get(username=pk_test)
-    student_name = user.student.name
-    student_budget = user.student.budget
-    student_preferred_restaurants = user.student.preferred_restaurants
-    student_preferred_cuisines = user.student.preferred_cuisines
-    student_not_preferred = user.student.not_preferred
-    return HttpResponse('a little work left') 
+    name = user.student.name
+    budget_total = user.student.budget_total
+    budget_spent = user.student.budget_spent
+    preferred_restaurants = user.student.preferred_restaurants
+    preferred_cuisines = user.student.preferred_cuisines
+    dislikes = user.student.not_preferred
+    restrs = [{"name": "abc", "price": 120}, {"name": "def", "price": 300}]
+    mess_menu = ["chole", "poori", "raita"]
+
+    # Get the recommendation
+    print(budget_total, budget_spent, preferred_restaurants, preferred_cuisines, dislikes)
+    recommendation = recommend(budget_total, budget_spent, restrs, dislikes, mess_menu)
+
+    return JsonResponse(recommendation)
