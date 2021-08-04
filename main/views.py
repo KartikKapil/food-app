@@ -1,5 +1,3 @@
-import csv
-import os
 from datetime import datetime
 
 from django.contrib import messages
@@ -12,40 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import DocumentForm, NewStudentForm, NewUserForm
 from .models import Document, Student, User
 from .recommend import recommend as recommend_dish
-
-# Create your views here.
-
-
-def handle_uploaded_file(f, username):
-    fields = []
-    objects = []
-    days = {"sunday": 0, "monday": 1, "tuesday": 2, "wednesday": 3, "thursday": 4, "friday": 5, "saturday": 6}
-
-    with open('temp_menu.csv', 'wb+') as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
-
-    with open('temp_menu.csv', 'r') as destination:
-        csvreader = csv.reader(destination)
-        next(csvreader)
-        for j in range(6):
-            fields = next(csvreader)
-            fields[0] = days[fields[0].lower()]
-            objects.append(fields)
-
-    os.remove('temp_menu.csv')
-
-    time_of_the_day = ['breakfast', 'lunch', 'dinner']
-    user = User.objects.get(username=username)
-    student_name = user.student.name
-    student = Student.objects.get(name=student_name)
-
-    for items in objects:
-        i = 1
-        for time in time_of_the_day:
-            newDoc = Document(student=student, day=items[0], time=time, dishes=items[i])
-            i = i+1
-            newDoc.save()
+from .utility import get_restaurants, handle_uploaded_file
 
 
 @csrf_exempt
@@ -91,8 +56,9 @@ def signup(request):
 
             username = userForm.cleaned_data.get('username')
             handle_uploaded_file(request.FILES['file'], username)
+            get_restaurants(request.POST["preferred_restaurants"], username)
 
-            messages.success(request, 'Account was created for ' + user)
+            messages.success(request, 'Account was created for ' + username)
             print("saved")
             return JsonResponse({'status': 'success'}, status=201)
 
