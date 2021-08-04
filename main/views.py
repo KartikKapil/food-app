@@ -4,7 +4,7 @@ from django.contrib.auth import login as auth_login
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-
+import os
 from .forms import DocumentForm, NewStudentForm, NewUserForm
 from .models import User, Document, Student
 from .recommend import recommend
