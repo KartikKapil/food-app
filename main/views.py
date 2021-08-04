@@ -11,17 +11,27 @@ import csv
 # Create your views here.
 
 def handle_uploaded_file(f,username):
-    # for chunk in f:
-    #     print(chunk)
-    #     print("\n")
-    ll = [[1,'chole','raita','aloo'],[2,'mattar','panner','tamaar']]
+    fields = []
+    objects = []
+
+    with open('try.csv','wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+
+    with open('try.csv','r') as destination:
+        csvreader = csv.reader(destination)
+        next(csvreader)
+        for j in range(6):
+            fields = next(csvreader)
+            objects.append(fields)
+
     time_of_the_day=['Breakfast','Lunch','Dinner']
     user = User.objects.get(username=username)
     student_name = user.student.name
     student = Student.objects.get(name = student_name)
     # print("\n Student name is :")
     # print(student_name)
-    for items in ll:
+    for items in objects:
         i=1
         for time in time_of_the_day:
             newDoc = Document(user=student,Day_of_name=items[0],Time=time,food_item_name=items[i])
