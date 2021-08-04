@@ -5,9 +5,10 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import os
+from datetime import datetime
 from .forms import DocumentForm, NewStudentForm, NewUserForm
 from .models import User, Document, Student
-from .recommend import recommend
+from .recommend import recommend as recommend_dish
 import csv
 # Create your views here.
 
@@ -15,7 +16,7 @@ import csv
 def handle_uploaded_file(f, username):
     fields = []
     objects = []
-    days = {"sunday": 1, "monday": 2, "tuesday": 3, "wednesday": 4, "thursday": 5, "friday": 6, "saturday": 7}
+    days = {"sunday": 0, "monday": 1, "tuesday": 2, "wednesday": 3, "thursday": 4, "friday": 5, "saturday": 6}
 
     with open('temp_menu.csv', 'wb+') as destination:
         for chunk in f.chunks():
@@ -124,17 +125,21 @@ def home(request):
 def recommend(request, pk_test):
     # Fetch the required data
     user = User.objects.get(username=pk_test)
-    name = user.student.name
+    student = user.student
+
     budget_total = user.student.budget_total
     budget_spent = user.student.budget_spent
     preferred_restaurants = user.student.preferred_restaurants
     preferred_cuisines = user.student.preferred_cuisines
     dislikes = user.student.not_preferred
+
+    today = datetime.now().strftime("%w")
+    mess_menu = Document.objects.get(user=student, Day_of_name=today, Time="Lunch").food_item_name
+
     restrs = [{"name": "abc", "price": 120}, {"name": "def", "price": 300}]
-    mess_menu = ["chole", "poori", "raita"]
 
     # Get the recommendation
     print(budget_total, budget_spent, preferred_restaurants, preferred_cuisines, dislikes)
-    recommendation = recommend(budget_total, budget_spent, restrs, dislikes, mess_menu)
+    recommendation = recommend_dish(budget_total, budget_spent, restrs, dislikes, mess_menu)
 
     return JsonResponse(recommendation)
