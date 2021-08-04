@@ -11,40 +11,46 @@ from .recommend import recommend
 import csv
 # Create your views here.
 
-def handle_uploaded_file(f,username):
+
+def handle_uploaded_file(f, username):
     fields = []
     objects = []
+    days = {"sunday": 1, "monday": 2, "tuesday": 3, "wednesday": 4, "thursday": 5, "friday": 6, "saturday": 7}
 
-    with open('try.csv','wb+') as destination:
+    with open('temp_menu.csv', 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
 
-    with open('try.csv','r') as destination:
+    with open('temp_menu.csv', 'r') as destination:
         csvreader = csv.reader(destination)
         next(csvreader)
         for j in range(6):
             fields = next(csvreader)
+            fields[0] = days[fields[0].lower()]
             objects.append(fields)
 
-    time_of_the_day=['Breakfast','Lunch','Dinner']
+    os.remove('temp_menu.csv')
+
+    time_of_the_day = ['Breakfast', 'Lunch', 'Dinner']
     user = User.objects.get(username=username)
     student_name = user.student.name
-    student = Student.objects.get(name = student_name)
+    student = Student.objects.get(name=student_name)
     # print("\n Student name is :")
     # print(student_name)
     for items in objects:
-        i=1
+        i = 1
         for time in time_of_the_day:
-            newDoc = Document(user=student,Day_of_name=items[0],Time=time,food_item_name=items[i])
+            newDoc = Document(user=student, Day_of_name=items[0], Time=time, food_item_name=items[i])
             i = i+1
             newDoc.save()
+
 
 @csrf_exempt
 def signup(request):
     if request.method == "POST":
         userForm = NewUserForm(request.POST)
         newStudent = NewStudentForm(request.POST)
-        newDocument = DocumentForm(request.POST,request.FILES)
+        newDocument = DocumentForm(request.POST, request.FILES)
 
         # Keeing for future debugging, remove when stable
         #  print("userform non_field_errors: ")
@@ -59,8 +65,8 @@ def signup(request):
 
         #  print("document non_field_errors: ")
         #  print(newDocument.non_field_errors)
-        # print("document field_errors: ")
-        # print([ (field.label, field.errors) for field in newDocument] )
+        #  print("document field_errors: ")
+        #  print([ (field.label, field.errors) for field in newDocument] )
 
         print("userForm.is_valid(): ")
         print(userForm.is_valid())
@@ -81,7 +87,7 @@ def signup(request):
             student.save()
             # newDocument.save()
             user = userForm.cleaned_data.get('username')
-            handle_uploaded_file(request.FILES['file'],user)
+            handle_uploaded_file(request.FILES['file'], user)
             messages.success(request, 'Account was created for ' + user)
             print("saved")
             return JsonResponse({'status': 'success'}, status=201)
