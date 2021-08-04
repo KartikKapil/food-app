@@ -18,7 +18,7 @@ class Student(models.Model):
 
 class Document(models.Model):
     user  = models.ForeignKey(Student,on_delete=models.CASCADE)
-    Date = models.DateField(auto_now=True)
-    Time = models.TimeField(auto_now=True)
+    Day_of_name = models.IntegerField(blank=False)
+    Time = models.CharField(max_length=300)
     food_item_name = models.CharField(max_length=200)
     # upload_mess_menu = models.FileField(upload_to='uploads/%Y/%m/%d')

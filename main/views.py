@@ -7,9 +7,26 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .forms import DocumentForm, NewStudentForm, NewUserForm
 from .models import *
-
+import csv
 # Create your views here.
 
+def handle_uploaded_file(f,username):
+    # for chunk in f:
+    #     print(chunk)
+    #     print("\n")
+    ll = [[1,'chole','raita','aloo'],[2,'mattar','panner','tamaar']]
+    time_of_the_day=['Breakfast','Lunch','Dinner']
+    user = User.objects.get(username=username)
+    student_name = user.student.name
+    student = Student.objects.get(name = student_name)
+    # print("\n Student name is :")
+    # print(student_name)
+    for items in ll:
+        i=1
+        for time in time_of_the_day:
+            newDoc = Document(user=student,Day_of_name=items[0],Time=time,food_item_name=items[i])
+            i = i+1
+            newDoc.save()
 
 @csrf_exempt
 def signup(request):
@@ -34,12 +51,12 @@ def signup(request):
         # print("document field_errors: ")
         # print([ (field.label, field.errors) for field in newDocument] )
 
-        # print("userForm.is_valid(): ")
-        # print(userForm.is_valid())
-        # print("newStudent.is_valid(): ")
-        # print(newStudent.is_valid())
-        # print("newDocument.is_valid(): ")
-        # print(newDocument.is_valid())
+        print("userForm.is_valid(): ")
+        print(userForm.is_valid())
+        print("newStudent.is_valid(): ")
+        print(newStudent.is_valid())
+        print("newDocument.is_valid(): ")
+        print(newDocument.is_valid())
 
         #  print("data: ")
         #  print(dict(request.POST))
@@ -53,6 +70,7 @@ def signup(request):
             student.save()
             # newDocument.save()
             user = userForm.cleaned_data.get('username')
+            handle_uploaded_file(request.FILES['file'],user)
             messages.success(request, 'Account was created for ' + user)
             print("saved")
             return JsonResponse({'status': 'success'}, status=201)
