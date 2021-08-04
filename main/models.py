@@ -18,8 +18,8 @@ class Student(models.Model):
         return self.name
 
 class Document(models.Model):
-    user  = models.ForeignKey(Student,on_delete=models.CASCADE)
-    Day_of_name = models.IntegerField(blank=False)
-    Time = models.CharField(max_length=300)
-    food_item_name = models.CharField(max_length=200)
+    student = models.ForeignKey(Student,on_delete=models.CASCADE)
+    day = models.IntegerField(blank=False)
+    time = models.CharField(max_length=20)
+    dishes = models.CharField(max_length=200)
     # upload_mess_menu = models.FileField(upload_to='uploads/%Y/%m/%d')

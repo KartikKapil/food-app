@@ -35,16 +35,15 @@ def handle_uploaded_file(f, username):
 
     os.remove('temp_menu.csv')
 
-    time_of_the_day = ['Breakfast', 'Lunch', 'Dinner']
+    time_of_the_day = ['breakfast', 'lunch', 'dinner']
     user = User.objects.get(username=username)
     student_name = user.student.name
     student = Student.objects.get(name=student_name)
-    # print("\n Student name is :")
-    # print(student_name)
+
     for items in objects:
         i = 1
         for time in time_of_the_day:
-            newDoc = Document(user=student, Day_of_name=items[0], Time=time, food_item_name=items[i])
+            newDoc = Document(student=student, day=items[0], time=time, dishes=items[i])
             i = i+1
             newDoc.save()
 
@@ -89,9 +88,10 @@ def signup(request):
             student = newStudent.save(commit=False)
             student.user = user
             student.save()
-            # newDocument.save()
-            user = userForm.cleaned_data.get('username')
-            handle_uploaded_file(request.FILES['file'], user)
+
+            username = userForm.cleaned_data.get('username')
+            handle_uploaded_file(request.FILES['file'], username)
+
             messages.success(request, 'Account was created for ' + user)
             print("saved")
             return JsonResponse({'status': 'success'}, status=201)
@@ -137,12 +137,11 @@ def recommend(request, pk_test):
     dislikes = user.student.not_preferred
 
     today = datetime.now().strftime("%w")
-    mess_menu = Document.objects.get(user=student, Day_of_name=today, Time="Lunch").food_item_name
+    mess_menu = Document.objects.get(student=student, day=today, time="lunch").dishes
 
     restrs = [{"name": "abc", "price": 120}, {"name": "def", "price": 300}]
 
     # Get the recommendation
-    print(budget_total, budget_spent, preferred_restaurants, preferred_cuisines, dislikes)
     recommendation = recommend_dish(budget_total, budget_spent, restrs, dislikes, mess_menu)
 
     return JsonResponse(recommendation)
