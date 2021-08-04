@@ -17,7 +17,7 @@ class NewUserForm(UserCreationForm):
 class NewStudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ["name", "address", "phone", "budget", "preferred_restaurants", "preferred_cuisines", "not_preferred"]
+        fields = ["name", "address", "phone", "budget_total", "preferred_restaurants", "preferred_cuisines", "not_preferred"]
 
 class DocumentForm(forms.Form):
     # title = forms.CharField(max_length=50)
