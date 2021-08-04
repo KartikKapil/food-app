@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import DocumentForm, NewStudentForm, NewUserForm
-from .models import User, Document
+from .models import User, Document, Student
 from .recommend import recommend
 import csv
 # Create your views here.
