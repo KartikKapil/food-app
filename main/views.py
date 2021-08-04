@@ -1,15 +1,18 @@
+import csv
+import os
+from datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-import os
-from datetime import datetime
+
 from .forms import DocumentForm, NewStudentForm, NewUserForm
-from .models import User, Document, Student
+from .models import Document, Student, User
 from .recommend import recommend as recommend_dish
-import csv
+
 # Create your views here.
 
 
