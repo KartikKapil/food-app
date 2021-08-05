@@ -7,5 +7,6 @@ urlpatterns = [
     path('', views.home, name="home"),
     path('signup/', views.signup, name="signup"),
     path('login/', views.login, name="login"),
-    path('recommend/<str:pk_test>', views.recommend, name="recommend"),
+    path('recommend/<str:username>/', views.recommend, name="recommend"),
+    path('not_loged_in/',views.not_loged_in,name='not_logged_in'),
 ]

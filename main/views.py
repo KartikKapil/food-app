@@ -1,17 +1,20 @@
 from datetime import datetime
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 from .forms import DocumentForm, NewStudentForm, NewUserForm
 from .models import Document, Student, User
 from .recommend import recommend as recommend_dish
 from .utility import get_restaurants, handle_uploaded_file
 
+def not_loged_in(request):
+    return JsonResponse({'status': 'failure'}, status=400)
 
 @csrf_exempt
 def signup(request):
@@ -90,10 +93,10 @@ def login(request):
 def home(request):
     return HttpResponse('hello world')
 
-
-def recommend(request, pk_test):
+@login_required(login_url='/not_loged_in/')
+def recommend(request, username):
     # Fetch the required data
-    user = User.objects.get(username=pk_test)
+    user = User.objects.get(username=username)
     student = user.student
 
     budget_total = user.student.budget_total
@@ -103,7 +106,11 @@ def recommend(request, pk_test):
     dislikes = user.student.not_preferred
 
     today = datetime.now().strftime("%w")
-    mess_menu = Document.objects.get(student=student, day=today, time="lunch").dishes
+    try:
+        mess_menu = Document.objects.get(student=student, day=today, time="lunch").dishes
+    except ObjectDoesNotExist:
+        # object does not exists
+        return JsonResponse({'status': 'failure'}, status=403)
 
     restrs = [{"name": "abc", "price": 120}, {"name": "def", "price": 300}]
 
