@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import fields
 
-from .models import Document, Student
+from .models import *
 
 
 class NewUserForm(UserCreationForm):
@@ -23,5 +23,9 @@ class DocumentForm(forms.Form):
     # title = forms.CharField(max_length=50)
     file = forms.FileField()
 
+class VendorForm(forms.ModelForm):
+    class Meta:
+        model = Vendor
+        fields = '__all__'
 
 
