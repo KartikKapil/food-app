@@ -1,20 +1,43 @@
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
-from django.contrib.auth import authenticate
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
+from rest_framework import permissions, status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+
+from .serializers import UserSerializer, UserSerializerWithToken
 from .forms import DocumentForm, NewStudentForm, NewUserForm
-from .models import Document, Student, User
+from .models import Document, Student
 from .recommend import recommend as recommend_dish
 from .utility import get_restaurants, handle_uploaded_file
 
 def not_loged_in(request):
     return JsonResponse({'status': 'failure'}, status=400)
+
+
+@api_view(['GET'])
+def current_user(request):
+
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny, ))
+def user_create(request):
+    serializer = UserSerializerWithToken(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @csrf_exempt
 def signup(request):
