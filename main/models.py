@@ -33,10 +33,10 @@ class Restaurant(models.Model):
     address = models.CharField(max_length=100)
     price = models.IntegerField(blank=False)
 
+
 class Vendor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     address = models.CharField(max_length=300)
     phone = models.IntegerField(default=False)
     price = models.IntegerField(default=False)
-  
