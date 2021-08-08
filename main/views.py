@@ -14,9 +14,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 from .forms import DocumentForm, NewStudentForm, NewUserForm
-from .models import Document, Student
+from .models import Menu, Student
 from .recommend import recommend as recommend_dish
-from .serializers import UserSerializer, UserSerializerWithToken
+from .serializers import (
+    StudentSerializer, UserSerializer, UserSerializerWithToken
+)
 from .utility import get_restaurants, handle_uploaded_file
 
 
@@ -39,6 +41,35 @@ def user_create(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny, ))
+def new_signup(request):
+    # Get the serialized data
+    user_serializer = UserSerializerWithToken(data=request.data)
+    student_serializer = StudentSerializer(data=request.data)
+
+    # Save the data if Valid
+    if user_serializer.is_valid() and student_serializer.is_valid():
+        user = user_serializer.save()
+        student_serializer.save(user=user)
+        response = {
+            "user": user_serializer.data,
+            "student": student_serializer.data
+        }
+        return Response(response, status=status.HTTP_201_CREATED)
+
+    # Make sure is_valid is called for each serializer
+    user_serializer.is_valid()
+    student_serializer.is_valid()
+
+    # Return the errors as a JSON Response
+    errors = {
+        "user": user_serializer.errors,
+        "student": student_serializer.errors
+    }
+    return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt

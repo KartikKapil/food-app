@@ -19,7 +19,7 @@ class Student(models.Model):
         return self.name
 
 
-class Document(models.Model):
+class Menu(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     day = models.IntegerField(blank=False)
     time = models.CharField(max_length=20)

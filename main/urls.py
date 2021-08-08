@@ -10,4 +10,5 @@ urlpatterns = [
     path('not_loged_in/', views.not_loged_in, name='not_logged_in'),
     path('current-user/', views.current_user),
     path('user-create/', views.user_create),
+    path('new_signup/', views.new_signup),
 ]

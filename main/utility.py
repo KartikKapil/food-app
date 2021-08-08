@@ -3,7 +3,7 @@ import os
 
 import requests
 
-from .models import Document, Restaurant, Student, User
+from .models import Menu, Restaurant, Student, User
 
 
 def handle_uploaded_file(f, username):
@@ -33,7 +33,7 @@ def handle_uploaded_file(f, username):
     for items in objects:
         i = 1
         for time in time_of_the_day:
-            newDoc = Document(student=student, day=items[0], time=time, dishes=items[i])
+            newDoc = Menu(student=student, day=items[0], time=time, dishes=items[i])
             i = i+1
             newDoc.save()
 
