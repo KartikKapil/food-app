@@ -20,7 +20,7 @@ from .recommend import recommend as recommend_dish
 from .serializers import (
     StudentSerializer, UserSerializer, UserSerializerWithToken, VendorSerializer
 )
-from .utility import get_restaurants, handle_uploaded_file
+from .utility import get_restaurants, handle_uploaded_file, Distance_between_user_and_vendors
 
 
 def not_loged_in(request):
@@ -29,6 +29,7 @@ def not_loged_in(request):
 
 @api_view(['GET'])
 def current_user(request):
+    """LOGIN AUTHENTICATION"""
 
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
@@ -37,16 +38,33 @@ def current_user(request):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
 def user_create(request):
+    """USER CREATION"""
+
     serializer = UserSerializerWithToken(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny, ))
+def ClosestVendor(request):
+    """ TO GET THE NEAREST VENDORS """
+    latitude_user = request.GET['latitude']
+    longitute_user = request.GET['longitute']
+    # CURRENTLY SET BY ME CAN BE ADJUSTED BY USER LATER
+    raidus_of_action = 1000
+    response = Distance_between_user_and_vendors(latitude_user,longitute_user,raidus_of_action)
+
+    return Response(response,status=200)
+
+
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
 def new_signup(request):
+    """STUDENT SIGN UP"""
+
     # Get the serialized data
     user_serializer = UserSerializerWithToken(data=request.data)
     student_serializer = StudentSerializer(data=request.data)
@@ -76,6 +94,8 @@ def new_signup(request):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
 def new_vendor_signup(request):
+    """ VENDOR SIGNUP"""
+
     user_serializer = UserSerializerWithToken(data=request.data)
     vendor_serializer = VendorSerializer(data=request.data)
 
@@ -101,6 +121,8 @@ def new_vendor_signup(request):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
 def Mess_menu_upload(request):
+    """ FILE UPLOAD AND MANGEMNET"""
+
     username = request.POST.get('username')
     parser_classes = [FileUploadParser]
     file_obj = request.data['file']
@@ -133,6 +155,8 @@ def login(request):
 
 @login_required(login_url='/not_loged_in/')
 def recommend(request, username):
+    """ RECOMMENDATION ENGINE"""
+
     # Fetch the required data
     user = User.objects.get(username=username)
     student = user.student

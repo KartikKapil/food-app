@@ -1,12 +1,34 @@
 import csv
+import json
 import os
-
 import requests
+from .models import Menu, Restaurant, Student, User, Vendor
+from math import radians, cos, sin, asin, sqrt
 
-from .models import Menu, Restaurant, Student, User
+def distance(lat1, lat2, lon1, lon2):
+    """TO FIND THE DISTANCE BETWEEN TWO GIVEN POSITIONAL CORDINATES"""
 
+    lon1 = radians(lon1)
+    lon2 = radians(lon2)
+    lat1 = radians(lat1)
+    lat2 = radians(lat2)
+      
+    # Haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+ 
+    c = 2 * asin(sqrt(a))
+    
+    # Radius of earth in kilometers. Use 3956 for miles
+    r = 6371
+      
+    # calculate the result
+    return(c * r)
 
 def handle_uploaded_file(f, username):
+    """TO CHECK READ AND INITIATE OBJECTS OF MENU CLASS WHILE SIMINTALOUS LIKING THEM TO STUDENT OBJECTS """
+
     fields = []
     objects = []
     days = {"sunday": 0, "monday": 1, "tuesday": 2, "wednesday": 3, "thursday": 4, "friday": 5, "saturday": 6}
@@ -63,3 +85,21 @@ def get_restaurants(ids_str, username):
         new_rest.save()
 
 #  get_restaurants('307374,307113')
+
+def Distance_between_user_and_vendors(latitude_user,longitute_user,raidus_of_action):
+    """TO GIVE THE LIST OF NEAREST RESTUTARNTS OF A GIVEN USER"""
+
+    latitude_user = float(latitude_user)
+    longitute_user = float(longitute_user)
+    Vendors = Vendor.objects.all()
+    Nearby_vendors = []
+    for vendors in Vendors:
+        vendor_latitude = vendors.latitude
+        vendor_longitute = vendors.longitute
+        if(distance(latitude_user,vendor_latitude,longitute_user,vendor_longitute)<=raidus_of_action):
+            Nearby_vendors.append(vendors.name)
+    
+    Vendor_Names = json.dumps({"Nearby Vendors":Nearby_vendors})
+    return Vendor_Names
+    
+
