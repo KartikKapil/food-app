@@ -1,6 +1,5 @@
 from datetime import datetime
-from rest_framework import parsers
-from rest_framework.parsers import FileUploadParser,MultiPartParser
+
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
@@ -10,15 +9,19 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import permissions, status
-from rest_framework import response
-from rest_framework.decorators import api_view, parser_classes, permission_classes
+from rest_framework import parsers, permissions, response, status
+from rest_framework.decorators import (
+    api_view, parser_classes, permission_classes
+)
+from rest_framework.parsers import FileUploadParser, MultiPartParser
 from rest_framework.response import Response
+
 from .forms import DocumentForm, NewStudentForm, NewUserForm
 from .models import Menu, Student
 from .recommend import recommend as recommend_dish
 from .serializers import (
-    StudentSerializer, UserSerializer, UserSerializerWithToken, VendorSerializer
+    StudentSerializer, UserSerializer, UserSerializerWithToken,
+    VendorSerializer
 )
 from .utility import get_restaurants, handle_uploaded_file
 
