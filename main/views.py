@@ -1,5 +1,6 @@
 from datetime import datetime
-
+from rest_framework import parsers
+from rest_framework.parsers import FileUploadParser,MultiPartParser
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
@@ -11,9 +12,8 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions, status
 from rest_framework import response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.response import Response
-
 from .forms import DocumentForm, NewStudentForm, NewUserForm
 from .models import Menu, Student
 from .recommend import recommend as recommend_dish
@@ -96,6 +96,14 @@ def new_vendor_signup(request):
         "vendors":vendor_serializer.errors
     }
     return Response(errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny, ))
+def handle_files(request):
+    parser_classes = [FileUploadParser]
+    file_obj = request.data['file']
+    return Response(status=204)
 
 
 @csrf_exempt

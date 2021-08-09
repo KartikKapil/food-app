@@ -12,4 +12,5 @@ urlpatterns = [
     path('user-create/', views.user_create),
     path('new_signup/', views.new_signup),
     path('new_vendor_signup/',views.new_vendor_signup),
+    path('file_upload/',views.handle_files),
 ]
