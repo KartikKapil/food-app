@@ -100,73 +100,20 @@ def new_vendor_signup(request):
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
-def handle_files(request):
+def Mess_menu_upload(request):
     username = request.POST.get('username')
     parser_classes = [FileUploadParser]
     file_obj = request.data['file']
-    response = {
+    if len(file_obj)!=0:
+        handle_uploaded_file(file_obj,username)
+        response = {
         "User":username
-    }
-    return Response(response,status=204)
-
-
-@csrf_exempt
-def signup(request):
-    if request.method == "POST":
-        userForm = NewUserForm(request.POST)
-        newStudent = NewStudentForm(request.POST)
-        newDocument = DocumentForm(request.POST, request.FILES)
-
-        # Keeing for future debugging, remove when stable
-        #  print("userform non_field_errors: ")
-        #  print(userForm.non_field_errors)
-        #  print("userform field_errors: ")
-        #  print([ (field.value, field.errors) for field in userForm] )
-
-        #  print("student non_field_errors: ")
-        #  print(newStudent.non_field_errors)
-        #  print("student field_errors: ")
-        #  print([ (field.label, field.errors) for field in newStudent] )
-
-        #  print("document non_field_errors: ")
-        #  print(newDocument.non_field_errors)
-        #  print("document field_errors: ")
-        #  print([ (field.label, field.errors) for field in newDocument] )
-
-        print("userForm.is_valid(): ")
-        print(userForm.is_valid())
-        print("newStudent.is_valid(): ")
-        print(newStudent.is_valid())
-        print("newDocument.is_valid(): ")
-        print(newDocument.is_valid())
-
-        #  print("data: ")
-        #  print(dict(request.POST))
-        #  print("File: ")
-        #  print(request.FILES)
-
-        if userForm.is_valid() and newStudent.is_valid() and newDocument.is_valid():
-            user = userForm.save()
-            student = newStudent.save(commit=False)
-            student.user = user
-            student.save()
-
-            username = userForm.cleaned_data.get('username')
-            handle_uploaded_file(request.FILES['file'], username)
-            get_restaurants(request.POST["preferred_restaurants"], username)
-
-            messages.success(request, 'Account was created for ' + username)
-            print("saved")
-            return JsonResponse({'status': 'success'}, status=201)
-
-        return JsonResponse({'status': 'failure'}, status=400)
+        }
+        return Response(response,status=204)
     else:
-        userForm = NewUserForm()
-        newStudent = NewStudentForm()
-        newDocument = DocumentForm()
-
-    return render(request, 'main/signup.html',
-                  {'userForm': userForm, 'newStudent': newStudent, 'newDocument': newDocument})
+        user=User.objects.get(username=username)
+        user.delete()
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt
@@ -184,10 +131,6 @@ def login(request):
     return HttpResponse('login page')
 
 
-def home(request):
-    return HttpResponse('hello world')
-
-
 @login_required(login_url='/not_loged_in/')
 def recommend(request, username):
     # Fetch the required data
@@ -202,7 +145,7 @@ def recommend(request, username):
 
     today = datetime.now().strftime("%w")
     try:
-        mess_menu = Document.objects.get(student=student, day=today, time="lunch").dishes
+        mess_menu = Menu.objects.get(student=student, day=today, time="lunch").dishes
     except ObjectDoesNotExist:
         # object does not exists
         return JsonResponse({'status': 'failure'}, status=403)
