@@ -101,9 +101,13 @@ def new_vendor_signup(request):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
 def handle_files(request):
+    username = request.POST.get('username')
     parser_classes = [FileUploadParser]
     file_obj = request.data['file']
-    return Response(status=204)
+    response = {
+        "User":username
+    }
+    return Response(response,status=204)
 
 
 @csrf_exempt
