@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
+from django.forms.models import model_to_dict
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
-from .models import Student
+from .models import Student,Vendor
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -16,6 +17,11 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         exclude = ('user', 'budget_spent', )
+
+class VendorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vendor
+        exclude = ('user', )
 
 
 class UserSerializerWithToken(serializers.ModelSerializer):

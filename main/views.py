@@ -10,6 +10,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions, status
+from rest_framework import response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
@@ -17,7 +18,7 @@ from .forms import DocumentForm, NewStudentForm, NewUserForm
 from .models import Menu, Student
 from .recommend import recommend as recommend_dish
 from .serializers import (
-    StudentSerializer, UserSerializer, UserSerializerWithToken
+    StudentSerializer, UserSerializer, UserSerializerWithToken, VendorSerializer
 )
 from .utility import get_restaurants, handle_uploaded_file
 
@@ -70,6 +71,31 @@ def new_signup(request):
         "student": student_serializer.errors
     }
     return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny, ))
+def new_vendor_signup(request):
+    user_serializer = UserSerializerWithToken(data=request.data)
+    vendor_serializer = VendorSerializer(data=request.data)
+
+    if user_serializer.is_valid() and vendor_serializer.is_valid():
+        user = user_serializer.save()
+        vendor_serializer.save(user=user)
+        response = {
+            "user":user_serializer.data,
+            "vendor":vendor_serializer.data
+        }
+        return Response(response, status=status.HTTP_201_CREATED)
+    print('user_serializer.is_valid():')
+    print(user_serializer.is_valid())
+    print('vendor_serializer.is_valid():')
+    print(vendor_serializer.is_valid())
+    errors = {
+        "user":user_serializer.errors,
+        "vendors":vendor_serializer.errors
+    }
+    return Response(errors,status=status.HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt

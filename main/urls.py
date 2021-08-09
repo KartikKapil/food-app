@@ -11,4 +11,5 @@ urlpatterns = [
     path('current-user/', views.current_user),
     path('user-create/', views.user_create),
     path('new_signup/', views.new_signup),
+    path('new_vendor_signup/',views.new_vendor_signup),
 ]
