@@ -49,6 +49,7 @@ def user_create(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny, ))
 def ClosestVendor(request):
@@ -57,10 +58,9 @@ def ClosestVendor(request):
     longitute_user = request.GET['longitute']
     # CURRENTLY SET BY ME CAN BE ADJUSTED BY USER LATER
     raidus_of_action = 1000
-    response = Distance_between_user_and_vendors(latitude_user,longitute_user,raidus_of_action)
+    response = Distance_between_user_and_vendors(latitude_user, longitute_user, raidus_of_action)
 
-    return Response(response,status=200)
-
+    return Response(response, status=200)
 
 
 @api_view(['POST'])
@@ -106,8 +106,8 @@ def new_vendor_signup(request):
         user = user_serializer.save()
         vendor_serializer.save(user=user)
         response = {
-            "user":user_serializer.data,
-            "vendor":vendor_serializer.data
+            "user": user_serializer.data,
+            "vendor": vendor_serializer.data
         }
         return Response(response, status=status.HTTP_201_CREATED)
     print('user_serializer.is_valid():')
@@ -115,10 +115,10 @@ def new_vendor_signup(request):
     print('vendor_serializer.is_valid():')
     print(vendor_serializer.is_valid())
     errors = {
-        "user":user_serializer.errors,
-        "vendors":vendor_serializer.errors
+        "user": user_serializer.errors,
+        "vendors": vendor_serializer.errors
     }
-    return Response(errors,status=status.HTTP_400_BAD_REQUEST)
+    return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -129,14 +129,14 @@ def Mess_menu_upload(request):
     username = request.POST.get('username')
     parser_classes = [FileUploadParser]
     file_obj = request.data['file']
-    if len(file_obj)!=0:
-        handle_uploaded_file(file_obj,username)
+    if len(file_obj) != 0:
+        handle_uploaded_file(file_obj, username)
         response = {
-        "User":username
+            "User": username
         }
-        return Response(response,status=204)
+        return Response(response, status=204)
     else:
-        user=User.objects.get(username=username)
+        user = User.objects.get(username=username)
         user.delete()
         return Response(status=status.HTTP_400_BAD_REQUEST)
 

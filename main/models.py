@@ -42,5 +42,5 @@ class Vendor(models.Model):
     address = models.CharField(max_length=300)
     phone = models.IntegerField(default=False)
     price = models.IntegerField(default=False)
-    longitute = models.FloatField(null=False)
+    longitude = models.FloatField(null=False)
     latitude = models.FloatField(null=False)

@@ -9,7 +9,7 @@ urlpatterns = [
     path('current-user/', views.current_user),
     path('user-create/', views.user_create),
     path('new_signup/', views.new_signup),
-    path('new_vendor_signup/',views.new_vendor_signup),
-    path('file_upload/',views.Mess_menu_upload),
-    path('Closet_Value/',views.ClosestVendor),
+    path('new_vendor_signup/', views.new_vendor_signup),
+    path('file_upload/', views.Mess_menu_upload),
+    path('Closet_Value/', views.ClosestVendor),
 ]
