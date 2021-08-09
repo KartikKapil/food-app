@@ -23,7 +23,7 @@ from .serializers import (
     StudentSerializer, UserSerializer, UserSerializerWithToken,
     VendorSerializer
 )
-from .utility import get_restaurants, handle_uploaded_file
+from .utility import get_restaurants, handle_uploaded_file, Distance_between_user_and_vendors
 
 
 def not_loged_in(request):
@@ -32,6 +32,7 @@ def not_loged_in(request):
 
 @api_view(['GET'])
 def current_user(request):
+    """LOGIN AUTHENTICATION"""
 
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
@@ -40,16 +41,33 @@ def current_user(request):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
 def user_create(request):
+    """USER CREATION"""
+
     serializer = UserSerializerWithToken(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny, ))
+def ClosestVendor(request):
+    """ TO GET THE NEAREST VENDORS """
+    latitude_user = request.GET['latitude']
+    longitute_user = request.GET['longitute']
+    # CURRENTLY SET BY ME CAN BE ADJUSTED BY USER LATER
+    raidus_of_action = 1000
+    response = Distance_between_user_and_vendors(latitude_user,longitute_user,raidus_of_action)
+
+    return Response(response,status=200)
+
+
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
 def new_signup(request):
+    """STUDENT SIGN UP"""
+
     # Get the serialized data
     user_serializer = UserSerializerWithToken(data=request.data)
     student_serializer = StudentSerializer(data=request.data)
@@ -79,6 +97,8 @@ def new_signup(request):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
 def new_vendor_signup(request):
+    """ VENDOR SIGNUP"""
+
     user_serializer = UserSerializerWithToken(data=request.data)
     vendor_serializer = VendorSerializer(data=request.data)
 
@@ -103,73 +123,22 @@ def new_vendor_signup(request):
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
-def handle_files(request):
+def Mess_menu_upload(request):
+    """ FILE UPLOAD AND MANGEMNET"""
+
     username = request.POST.get('username')
     parser_classes = [FileUploadParser]
     file_obj = request.data['file']
-    response = {
+    if len(file_obj)!=0:
+        handle_uploaded_file(file_obj,username)
+        response = {
         "User":username
-    }
-    return Response(response,status=204)
-
-
-@csrf_exempt
-def signup(request):
-    if request.method == "POST":
-        userForm = NewUserForm(request.POST)
-        newStudent = NewStudentForm(request.POST)
-        newDocument = DocumentForm(request.POST, request.FILES)
-
-        # Keeing for future debugging, remove when stable
-        #  print("userform non_field_errors: ")
-        #  print(userForm.non_field_errors)
-        #  print("userform field_errors: ")
-        #  print([ (field.value, field.errors) for field in userForm] )
-
-        #  print("student non_field_errors: ")
-        #  print(newStudent.non_field_errors)
-        #  print("student field_errors: ")
-        #  print([ (field.label, field.errors) for field in newStudent] )
-
-        #  print("document non_field_errors: ")
-        #  print(newDocument.non_field_errors)
-        #  print("document field_errors: ")
-        #  print([ (field.label, field.errors) for field in newDocument] )
-
-        print("userForm.is_valid(): ")
-        print(userForm.is_valid())
-        print("newStudent.is_valid(): ")
-        print(newStudent.is_valid())
-        print("newDocument.is_valid(): ")
-        print(newDocument.is_valid())
-
-        #  print("data: ")
-        #  print(dict(request.POST))
-        #  print("File: ")
-        #  print(request.FILES)
-
-        if userForm.is_valid() and newStudent.is_valid() and newDocument.is_valid():
-            user = userForm.save()
-            student = newStudent.save(commit=False)
-            student.user = user
-            student.save()
-
-            username = userForm.cleaned_data.get('username')
-            handle_uploaded_file(request.FILES['file'], username)
-            get_restaurants(request.POST["preferred_restaurants"], username)
-
-            messages.success(request, 'Account was created for ' + username)
-            print("saved")
-            return JsonResponse({'status': 'success'}, status=201)
-
-        return JsonResponse({'status': 'failure'}, status=400)
+        }
+        return Response(response,status=204)
     else:
-        userForm = NewUserForm()
-        newStudent = NewStudentForm()
-        newDocument = DocumentForm()
-
-    return render(request, 'main/signup.html',
-                  {'userForm': userForm, 'newStudent': newStudent, 'newDocument': newDocument})
+        user=User.objects.get(username=username)
+        user.delete()
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt
@@ -187,12 +156,10 @@ def login(request):
     return HttpResponse('login page')
 
 
-def home(request):
-    return HttpResponse('hello world')
-
-
 @login_required(login_url='/not_loged_in/')
 def recommend(request, username):
+    """ RECOMMENDATION ENGINE"""
+
     # Fetch the required data
     user = User.objects.get(username=username)
     student = user.student
@@ -205,7 +172,7 @@ def recommend(request, username):
 
     today = datetime.now().strftime("%w")
     try:
-        mess_menu = Document.objects.get(student=student, day=today, time="lunch").dishes
+        mess_menu = Menu.objects.get(student=student, day=today, time="lunch").dishes
     except ObjectDoesNotExist:
         # object does not exists
         return JsonResponse({'status': 'failure'}, status=403)

@@ -14,6 +14,8 @@ class Student(models.Model):
     preferred_restaurants = models.TextField(null=False)
     preferred_cuisines = models.TextField(null=False)
     not_preferred = models.TextField(null=False)
+    longitute = models.FloatField(null=False)
+    latitude = models.FloatField(null=False)
 
     def __str__(self):
         return self.name
@@ -40,3 +42,5 @@ class Vendor(models.Model):
     address = models.CharField(max_length=300)
     phone = models.IntegerField(default=False)
     price = models.IntegerField(default=False)
+    longitute = models.FloatField(null=False)
+    latitude = models.FloatField(null=False)
