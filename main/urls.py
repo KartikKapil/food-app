@@ -1,5 +1,5 @@
 from django.urls import path
-
+from .views import *
 from . import views
 
 urlpatterns = [
@@ -13,4 +13,5 @@ urlpatterns = [
     path('file_upload/', views.Mess_menu_upload),
     path('Closet_Value/', views.ClosestVendor),
     path('change_budget_spent/',views.Set_budget_spent),
+    path('change_password/',ChangePasswordView.as_view()),
 ]

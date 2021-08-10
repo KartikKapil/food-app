@@ -1,7 +1,8 @@
 from datetime import datetime
-
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 from django.contrib import messages
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, password_validation
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -21,7 +22,7 @@ from .models import Menu, Student
 from .recommend import recommend as recommend_dish
 from .serializers import (
     StudentSerializer, UserSerializer, UserSerializerWithToken,
-    VendorSerializer
+    VendorSerializer,ChangePasswordSerializer
 )
 from .utility import get_restaurants, handle_uploaded_file, Distance_between_user_and_vendors
 
@@ -71,6 +72,42 @@ def Set_budget_spent(request):
     user.student.budget_spent = new_budget_spent
     student.save()
     return Response(status=200)
+
+
+class ChangePasswordView(generics.UpdateAPIView):
+    """
+    An endpoint for changing password.
+    """
+    serializer_class = ChangePasswordSerializer
+    model = User
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'Password updated successfully',
+                'data': []
+            }
+
+            return Response(response)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['POST'])
