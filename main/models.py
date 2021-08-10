@@ -5,12 +5,12 @@ from django.db import models
 
 
 class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE) #password to see
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     address = models.CharField(max_length=300)
     phone = models.IntegerField(default=False)
     budget_total = models.IntegerField(blank=False)
-    budget_spent = models.IntegerField(blank=False, default=0) #this
+    budget_spent = models.IntegerField(blank=False, default=0)
     preferred_restaurants = models.TextField(null=False)
     preferred_cuisines = models.TextField(null=False)
     not_preferred = models.TextField(null=False)
@@ -26,7 +26,6 @@ class Menu(models.Model):
     day = models.IntegerField(blank=False)
     time = models.CharField(max_length=20)
     dishes = models.CharField(max_length=200)
-    # upload_mess_menu = models.FileField(upload_to='uploads/%Y/%m/%d')
 
 
 class Restaurant(models.Model):
@@ -45,4 +44,8 @@ class Vendor(models.Model):
     longitude = models.FloatField(null=False)
     latitude = models.FloatField(null=False)
 
-#tranction model
+class Transcations(models.Model):
+    FROM  = models.ForeignKey(User, related_name='FROM',on_delete=models.CASCADE)
+    TO = models.ForeignKey(User, related_name='TO',on_delete=models.CASCADE)
+    AMOUNT = models.FloatField(blank=False)
+    DATE_TIME = models.DateTimeField(auto_now=True)
