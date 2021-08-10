@@ -62,6 +62,16 @@ def ClosestVendor(request):
 
     return Response(response, status=200)
 
+@api_view(['POST'])
+def Set_budget_spent(request):
+    new_budget_spent = request.POST.get('budget_spent')
+    username = request.POST.get('username')
+    user = User.objects.get(username=username)
+    student = user.student
+    user.student.budget_spent = new_budget_spent
+    student.save()
+    return Response(status=200)
+
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
