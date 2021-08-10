@@ -16,7 +16,7 @@ from rest_framework.decorators import (
 )
 from rest_framework.parsers import FileUploadParser, MultiPartParser
 from rest_framework.response import Response
-
+from rest_framework.views import APIView
 from .forms import DocumentForm, NewStudentForm, NewUserForm
 from .models import Menu, Student
 from .recommend import recommend as recommend_dish
@@ -73,41 +73,25 @@ def Set_budget_spent(request):
     student.save()
     return Response(status=200)
 
-
-class ChangePasswordView(generics.UpdateAPIView):
-    """
-    An endpoint for changing password.
-    """
-    serializer_class = ChangePasswordSerializer
-    model = User
-    permission_classes = (IsAuthenticated,)
-
-    def get_object(self, queryset=None):
-        obj = self.request.user
-        return obj
-
-    def update(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        serializer = self.get_serializer(data=request.data)
-
-        if serializer.is_valid():
-            # Check old password
-            if not self.object.check_password(serializer.data.get("old_password")):
-                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
-            # set_password also hashes the password that the user will get
-            self.object.set_password(serializer.data.get("new_password"))
-            self.object.save()
-            response = {
+@api_view(['POST'])
+def ChangePassword(request):
+    username = request.data.get("username")
+    user = User.objects.get(username=username)
+    password_serlizer = ChangePasswordSerializer(data=request.data)
+    if password_serlizer.is_valid():
+        if user.check_password(password_serlizer.data.get("old_password")):
+            return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(password_serlizer.data.get("new_password"))
+        user.save()
+        response = {
                 'status': 'success',
                 'code': status.HTTP_200_OK,
                 'message': 'Password updated successfully',
                 'data': []
             }
+        return Response(response)
 
-            return Response(response)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+            
 
 
 @api_view(['POST'])
