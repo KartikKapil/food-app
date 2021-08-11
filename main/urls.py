@@ -13,4 +13,5 @@ urlpatterns = [
     path('Closet_Value/', views.ClosestVendor),
     path('change_budget_spent/',views.Set_budget_spent),
     path('change_password/',views.ChangePassword),
+    path('get_all_transcation/',views.Return_Transcations),
 ]

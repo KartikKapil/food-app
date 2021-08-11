@@ -18,14 +18,14 @@ from rest_framework.parsers import FileUploadParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .forms import DocumentForm, NewStudentForm, NewUserForm
-from .models import Menu, Student
+from .models import Menu, Student, Vendor, Transcations
 from .recommend import recommend as recommend_dish
 from .serializers import (
     StudentSerializer, UserSerializer, UserSerializerWithToken,
     VendorSerializer,ChangePasswordSerializer
 )
 from .utility import get_restaurants, handle_uploaded_file, Distance_between_user_and_vendors
-
+import json
 
 def not_loged_in(request):
     return JsonResponse({'status': 'failure'}, status=400)
@@ -91,7 +91,24 @@ def ChangePassword(request):
             }
         return Response(response)
 
-            
+@api_view(['POST'])
+def Return_Transcations(request):
+    username = request.POST.get('username')
+    user = User.objects.get(username=username)
+    All_transcation = Transcations.objects.filter(FROM=user)
+    transcation  = []
+    for trans in All_transcation:
+        current_trans = []
+        current_trans.append(trans.TO.username)
+        current_trans.append(trans.AMOUNT)
+        current_trans.append(trans.DATE_TIME)
+        transcation.append(current_trans)
+
+    response = {"Transcations":transcation,'code':status.HTTP_200_OK}
+
+    return Response(response)
+
+
 
 
 @api_view(['POST'])
