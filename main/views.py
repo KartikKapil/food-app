@@ -1,27 +1,31 @@
+import json
 from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
+from django.contrib.auth import password_validation
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import parsers, permissions, response, status
+from rest_framework import generics, parsers, permissions, response, status
 from rest_framework.decorators import (
     api_view, parser_classes, permission_classes
 )
 from rest_framework.parsers import FileUploadParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .forms import DocumentForm, NewStudentForm, NewUserForm
-from .models import Menu, Student
+from .models import Menu, Student, Transcations, Vendor
 from .recommend import recommend as recommend_dish
 from .serializers import (
-    StudentSerializer, UserSerializer, UserSerializerWithToken,
-    VendorSerializer
+    ChangePasswordSerializer, StudentSerializer, UserSerializer,
+    UserSerializerWithToken, VendorSerializer
 )
 from .utility import (
     Distance_between_user_and_vendors, get_restaurants, handle_uploaded_file
@@ -63,6 +67,53 @@ def ClosestVendor(request):
     response = Distance_between_user_and_vendors(latitude_user, longitute_user, raidus_of_action)
 
     return Response(response, status=200)
+
+@api_view(['POST'])
+def Set_budget_spent(request):
+    new_budget_spent = request.POST.get('budget_spent')
+    username = request.POST.get('username')
+    user = User.objects.get(username=username)
+    student = user.student
+    user.student.budget_spent = new_budget_spent
+    student.save()
+    return Response(status=200)
+
+@api_view(['POST'])
+def ChangePassword(request):
+    username = request.data.get("username")
+    user = User.objects.get(username=username)
+    password_serlizer = ChangePasswordSerializer(data=request.data)
+    if password_serlizer.is_valid():
+        if user.check_password(password_serlizer.data.get("old_password")):
+            return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(password_serlizer.data.get("new_password"))
+        user.save()
+        response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'Password updated successfully',
+                'data': []
+            }
+        return Response(response)
+
+@api_view(['POST'])
+def Return_Transcations(request):
+    username = request.POST.get('username')
+    user = User.objects.get(username=username)
+    All_transcation = Transcations.objects.filter(FROM=user)
+    transcation  = []
+    for trans in All_transcation:
+        current_trans = []
+        current_trans.append(trans.TO.username)
+        current_trans.append(trans.AMOUNT)
+        current_trans.append(trans.DATE_TIME)
+        transcation.append(current_trans)
+
+    response = {"Transcations":transcation,'code':status.HTTP_200_OK}
+
+    return Response(response)
+
+
 
 
 @api_view(['POST'])

@@ -12,4 +12,7 @@ urlpatterns = [
     path('new_vendor_signup/', views.new_vendor_signup),
     path('file_upload/', views.Mess_menu_upload),
     path('closest_vendors/', views.ClosestVendor),
+    path('change_budget_spent/',views.Set_budget_spent),
+    path('change_password/',views.ChangePassword),
+    path('get_all_transcation/',views.Return_Transcations),
 ]

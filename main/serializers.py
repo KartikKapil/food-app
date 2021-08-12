@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 from django.forms.models import model_to_dict
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
@@ -50,3 +51,13 @@ class UserSerializerWithToken(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('token', 'username', 'password')
+
+class ChangePasswordSerializer(serializers.Serializer):
+    
+    """
+    Serializer for password change endpoint.
+    """
+    model = User
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+

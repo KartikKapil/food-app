@@ -27,7 +27,6 @@ class Menu(models.Model):
     day = models.IntegerField(blank=False)
     time = models.CharField(max_length=20)
     dishes = models.CharField(max_length=200)
-    # upload_mess_menu = models.FileField(upload_to='uploads/%Y/%m/%d')
 
 
 class Restaurant(models.Model):
@@ -45,3 +44,9 @@ class Vendor(models.Model):
     price = models.IntegerField(default=False)
     longitude = models.FloatField(null=False)
     latitude = models.FloatField(null=False)
+
+class Transcations(models.Model):
+    FROM  = models.ForeignKey(User, related_name='FROM',on_delete=models.CASCADE)
+    TO = models.ForeignKey(User, related_name='TO',on_delete=models.CASCADE)
+    AMOUNT = models.FloatField(blank=False)
+    DATE_TIME = models.DateTimeField(auto_now=True)
