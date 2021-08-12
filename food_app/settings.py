@@ -73,7 +73,8 @@ REST_FRAMEWORK = {
 }
 
 JWT_AUTH = {
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'food_app.utils.jwt_response_handler'
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'food_app.utils.jwt_response_handler',
+    'JWT_VERIFY_EXPIRATION': False
 }
 
 CORS_ALLOWED_ORIGINS = [

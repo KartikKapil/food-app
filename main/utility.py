@@ -1,9 +1,12 @@
 import csv
 import json
 import os
+from math import asin, cos, radians, sin, sqrt
+
 import requests
+
 from .models import Menu, Restaurant, Student, User, Vendor
-from math import radians, cos, sin, asin, sqrt
+
 
 def distance(lat1, lat2, lon1, lon2):
     """TO FIND THE DISTANCE BETWEEN TWO GIVEN POSITIONAL CORDINATES"""
@@ -12,17 +15,17 @@ def distance(lat1, lat2, lon1, lon2):
     lon2 = radians(lon2)
     lat1 = radians(lat1)
     lat2 = radians(lat2)
-      
+
     # Haversine formula
     dlon = lon2 - lon1
     dlat = lat2 - lat1
     a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
- 
+
     c = 2 * asin(sqrt(a))
-    
+
     # Radius of earth in kilometers. Use 3956 for miles
     r = 6371
-      
+
     # calculate the result
     return(c * r)
 
@@ -97,9 +100,8 @@ def Distance_between_user_and_vendors(latitude_user,longitute_user,raidus_of_act
         vendor_latitude = vendors.latitude
         vendor_longitute = vendors.longitute
         if(distance(latitude_user,vendor_latitude,longitute_user,vendor_longitute)<=raidus_of_action):
-            Nearby_vendors.append(vendors.name)
-    
-    Vendor_Names = json.dumps({"Nearby Vendors":Nearby_vendors})
+            Nearby_vendors.append({"id": vendors.user.username, "name": vendors.name})
+
+    Vendor_Names = {"vendors":Nearby_vendors}
     return Vendor_Names
-    
 

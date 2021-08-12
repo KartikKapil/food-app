@@ -12,9 +12,10 @@ class Student(models.Model):
     budget_total = models.IntegerField(blank=False)
     budget_spent = models.IntegerField(blank=False, default=0)
     preferred_restaurants = models.TextField(null=False)
+    preferred_vendors = models.TextField(null=True)
     preferred_cuisines = models.TextField(null=False)
     not_preferred = models.TextField(null=False)
-    longitute = models.FloatField(null=False)
+    longitude = models.FloatField(null=False)
     latitude = models.FloatField(null=False)
 
     def __str__(self):

@@ -23,7 +23,9 @@ from .serializers import (
     StudentSerializer, UserSerializer, UserSerializerWithToken,
     VendorSerializer
 )
-from .utility import get_restaurants, handle_uploaded_file, Distance_between_user_and_vendors
+from .utility import (
+    Distance_between_user_and_vendors, get_restaurants, handle_uploaded_file
+)
 
 
 def not_loged_in(request):
@@ -55,7 +57,7 @@ def user_create(request):
 def ClosestVendor(request):
     """ TO GET THE NEAREST VENDORS """
     latitude_user = request.GET['latitude']
-    longitute_user = request.GET['longitute']
+    longitute_user = request.GET['longitude']
     # CURRENTLY SET BY ME CAN BE ADJUSTED BY USER LATER
     raidus_of_action = 1000
     response = Distance_between_user_and_vendors(latitude_user, longitute_user, raidus_of_action)
@@ -156,12 +158,12 @@ def login(request):
     return HttpResponse('login page')
 
 
-@login_required(login_url='/not_loged_in/')
-def recommend(request, username):
+@api_view(['GET'])
+def recommend(request):
     """ RECOMMENDATION ENGINE"""
 
     # Fetch the required data
-    user = User.objects.get(username=username)
+    user = request.user
     student = user.student
 
     budget_total = user.student.budget_total
