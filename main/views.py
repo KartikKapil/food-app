@@ -1,26 +1,19 @@
-import json
 from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
-from django.contrib.auth import password_validation
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import generics, parsers, permissions, response, status
+from rest_framework import permissions, status
 from rest_framework.decorators import (
-    api_view, parser_classes, permission_classes
+    api_view, permission_classes
 )
-from rest_framework.parsers import FileUploadParser, MultiPartParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
-from .forms import DocumentForm, NewStudentForm, NewUserForm
 from .models import Menu, Student, Transcations, Vendor
 from .recommend import recommend as recommend_dish
 from .serializers import (
@@ -58,7 +51,7 @@ def user_create(request):
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny, ))
-def ClosestVendor(request):
+def closest_vendor(request):
     """ TO GET THE NEAREST VENDORS """
     latitude_user = request.GET['latitude']
     longitute_user = request.GET['longitude']
@@ -68,18 +61,19 @@ def ClosestVendor(request):
 
     return Response(response, status=200)
 
+
 @api_view(['POST'])
-def Set_budget_spent(request):
-    new_budget_spent = request.POST.get('budget_spent')
-    username = request.POST.get('username')
-    user = User.objects.get(username=username)
+def set_budget_spent(request):
+    user = request.user
     student = user.student
-    user.student.budget_spent = new_budget_spent
+    new_budget_spent = student.budget_total - int(request.data.get('budget'))
+    student.budget_spent = new_budget_spent
     student.save()
     return Response(status=200)
 
+
 @api_view(['POST'])
-def ChangePassword(request):
+def change_password(request):
     username = request.data.get("username")
     user = User.objects.get(username=username)
     password_serlizer = ChangePasswordSerializer(data=request.data)
@@ -89,31 +83,30 @@ def ChangePassword(request):
         user.set_password(password_serlizer.data.get("new_password"))
         user.save()
         response = {
-                'status': 'success',
-                'code': status.HTTP_200_OK,
-                'message': 'Password updated successfully',
-                'data': []
-            }
+            'status': 'success',
+            'code': status.HTTP_200_OK,
+            'message': 'Password updated successfully',
+            'data': []
+        }
         return Response(response)
 
+
 @api_view(['POST'])
-def Return_Transcations(request):
+def return_transcations(request):
     username = request.POST.get('username')
     user = User.objects.get(username=username)
-    All_transcation = Transcations.objects.filter(FROM=user)
-    transcation  = []
-    for trans in All_transcation:
+    all_transcation = Transcations.objects.filter(FROM=user)
+    transcation = []
+    for trans in all_transcation:
         current_trans = []
         current_trans.append(trans.TO.username)
         current_trans.append(trans.AMOUNT)
         current_trans.append(trans.DATE_TIME)
         transcation.append(current_trans)
 
-    response = {"Transcations":transcation,'code':status.HTTP_200_OK}
+    response = {"Transcations": transcation, 'code': status.HTTP_200_OK}
 
     return Response(response)
-
-
 
 
 @api_view(['POST'])
@@ -129,6 +122,7 @@ def new_signup(request):
     if user_serializer.is_valid() and student_serializer.is_valid():
         user = user_serializer.save()
         student_serializer.save(user=user)
+        get_restaurants(request.data["preferred_restaurants"], user.username)
         response = {
             "user": user_serializer.data,
             "student": student_serializer.data
@@ -176,7 +170,7 @@ def new_vendor_signup(request):
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
-def Mess_menu_upload(request):
+def mess_menu_upload(request):
     """ FILE UPLOAD AND MANGEMNET"""
 
     username = request.POST.get('username')
@@ -219,7 +213,6 @@ def recommend(request):
 
     budget_total = user.student.budget_total
     budget_spent = user.student.budget_spent
-    preferred_restaurants = user.student.preferred_restaurants
     preferred_cuisines = user.student.preferred_cuisines
     dislikes = user.student.not_preferred
 
@@ -228,7 +221,7 @@ def recommend(request):
         mess_menu = Menu.objects.get(student=student, day=today, time="lunch").dishes
     except ObjectDoesNotExist:
         # object does not exists
-        return JsonResponse({'status': 'failure'}, status=403)
+        return JsonResponse({'status': 'failure'}, status=404)
 
     restrs = [{"name": "abc", "price": 120}, {"name": "def", "price": 300}]
 

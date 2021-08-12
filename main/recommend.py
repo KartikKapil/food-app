@@ -26,6 +26,8 @@ def recommend(budget: int, spent: int, restrs: List[Dict],
     else:
         mod_perc_budget = perc_budget + LIKE_ERROR
 
+    print(mod_perc_budget)
+
     if mod_perc_budget < perc_days:
         # Rich buuooy, do recommend something
         restr_budget = ((perc_days + THRESHHOLD_MOD) - mod_perc_budget) * (budget - spent) / 100
