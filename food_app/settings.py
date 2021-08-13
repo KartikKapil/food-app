@@ -80,6 +80,7 @@ JWT_AUTH = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8100",
+    "https://foodflex.netlify.app"
 ]
 
 ROOT_URLCONF = 'food_app.urls'
