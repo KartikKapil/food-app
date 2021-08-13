@@ -8,7 +8,7 @@ class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     address = models.CharField(max_length=300)
-    phone = models.IntegerField(default=False)
+    phone = models.CharField(max_length=11)
     budget_total = models.IntegerField(blank=False)
     budget_spent = models.IntegerField(blank=False, default=0)
     preferred_restaurants = models.TextField(null=False)
