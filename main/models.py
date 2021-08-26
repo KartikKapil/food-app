@@ -7,6 +7,12 @@ from django.db import models
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
+    PAN_number = models.CharField(max_length=200)
+    # DOB_date = models.IntegerField(blank=False)
+    # DOB_month = models.IntegerField(blank=False)
+    # DOB_day = models.IntegerField(blank=False)
+    DOB = models.DateField()
     address = models.CharField(max_length=300)
     phone = models.CharField(max_length=11)
     budget_total = models.IntegerField(blank=False)
@@ -38,7 +44,10 @@ class Restaurant(models.Model):
 
 class Vendor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=200)
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
+    PAN_number = models.CharField(max_length=200)
+    DOB = models.DateField()
     address = models.CharField(max_length=300)
     phone = models.IntegerField(default=False)
     price = models.IntegerField(default=False)
