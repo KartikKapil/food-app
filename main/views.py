@@ -383,4 +383,8 @@ def add_balance(request):
     # print("Response Data: ", response_data)
     return JsonResponse({'status':response.status_code})
 
-
+@api_view(['Get'])
+def get_balance(request):
+    balance = request.user.student.Account_Bal
+    data = {'Balance':balance}
+    return JsonResponse(data)
