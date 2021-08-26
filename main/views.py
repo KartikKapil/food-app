@@ -119,19 +119,19 @@ def account_creation(request):
     data = {
         "ifiID": "140793",
         "individualType": "REAL",
-        "firstName": request.data.get("first_name"),
+        "firstName": request.data.get("name"),
         "lastName": request.data.get("last_name"),
         "dob": {
-            "year": request.data.get("year"),
-            "month": request.data.get("month"),
-            "day": request.data.get("day")
+            "year": request.data.get("DOB_year"),
+            "month": request.data.get("DOB_month"),
+            "day": request.data.get("DOB_date")
         },
         "kycDetails": {
             "kycStatus": "MINIMAL",
             "kycStatusPostExpiry": "string",
             "kycAttributes": {},
             "authData": {
-                "PAN": request.data.get("PAN")
+                "PAN": request.data.get("PAN_number")
             },
             "authType": "PAN"
         },
