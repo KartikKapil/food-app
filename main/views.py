@@ -158,6 +158,7 @@ def account_creation(request):
 
     response = requests.request("POST", url, headers=headers, data=payload)
     response_data = response.json()
+    print("Response Data: ", response_data)
     if not response.status_code == 200:
         print(response_data)
         return (None, None)
@@ -322,21 +323,21 @@ def make_transaction(request):
     url = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/transfers"
 
     data = {
-    "requestID": "testabcd",
-    "amount": {
-        "currency": "INR",
-        "amount": 10
-    },
-    "transferCode": "A2A_VBOPayout-VBO2U_AUTH",
-    "debitAccountID":student.Account_ID,
-    "creditAccountID": vendor.Account_ID,
-    "transferTime": int(time.time()),
-    "remarks": "Transaction"
+        "requestID": "testabcd",
+        "amount": {
+            "currency": "INR",
+            "amount": 10
+        },
+        "transferCode": "A2A_VBOPayout-VBO2U_AUTH",
+        "debitAccountID": student.Account_ID,
+        "creditAccountID": vendor.Account_ID,
+        "transferTime": int(time.time()),
+        "remarks": "Transaction"
     }
 
     headers = {
-    'X-Zeta-AuthToken': 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwidGFnIjoiNGNfLWdmV3pFTGg2bWZrSzByQjhEdyIsImFsZyI6IkExMjhHQ01LVyIsIml2IjoiM0lQS2RuaEI4RU9yQVhKRyJ9.w80fhzwFm8GnnZ1spk26SxQ2yf-XqCctikmV8MLYVxc.GtomDrqhlBj_rX05elWovA.A1yTzH7PNo66evnIpUqg7AkeHmTFGUmSst7WPDannMJBWX9b7jQ2H1gvySYNNKh3RTj-KyBow-Iaw7hGLTDSuc8As0ri7oDbC20-WBKmNscbFqMk0sEeMZScNFl8CwD935JXkxhAuWW7yq1Cxfo715SUPHexXx2b69JEEbbfBSwAGOCoXkmTNz562m_UUx9uvW9LEl3i16m6pxRmrp-7beFBb9Wr5DXBT0MI6NNS-vmjtcAxS6e7G-Y8nu5cNCKcpkrvGd6bw1STYW5oGNUtcxJWGpu844CNyKHpiEEoO2OVMYW-DTBJQ3qXRu_EIlCBJy_UMa8cXeVoxSKud6mAcB_jZrrxDP_L7kcMuwZfMuXpiWh4gJH4UiR3uECy5sUm.5FPBMDVsRfrl9XKklFSHRw',
-    'Content-Type': 'application/json'
+        'X-Zeta-AuthToken': 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwidGFnIjoiNGNfLWdmV3pFTGg2bWZrSzByQjhEdyIsImFsZyI6IkExMjhHQ01LVyIsIml2IjoiM0lQS2RuaEI4RU9yQVhKRyJ9.w80fhzwFm8GnnZ1spk26SxQ2yf-XqCctikmV8MLYVxc.GtomDrqhlBj_rX05elWovA.A1yTzH7PNo66evnIpUqg7AkeHmTFGUmSst7WPDannMJBWX9b7jQ2H1gvySYNNKh3RTj-KyBow-Iaw7hGLTDSuc8As0ri7oDbC20-WBKmNscbFqMk0sEeMZScNFl8CwD935JXkxhAuWW7yq1Cxfo715SUPHexXx2b69JEEbbfBSwAGOCoXkmTNz562m_UUx9uvW9LEl3i16m6pxRmrp-7beFBb9Wr5DXBT0MI6NNS-vmjtcAxS6e7G-Y8nu5cNCKcpkrvGd6bw1STYW5oGNUtcxJWGpu844CNyKHpiEEoO2OVMYW-DTBJQ3qXRu_EIlCBJy_UMa8cXeVoxSKud6mAcB_jZrrxDP_L7kcMuwZfMuXpiWh4gJH4UiR3uECy5sUm.5FPBMDVsRfrl9XKklFSHRw',
+        'Content-Type': 'application/json'
     }
 
     payload = json.dumps(data)
@@ -349,7 +350,7 @@ def make_transaction(request):
     #     Transcations(sender=request.user, reciever=reciever, amount=amount).save()
     #     return JsonResponse(response)
 
-    return JsonResponse({'data':'working'})
+    return JsonResponse({'data': 'working'})
 
 
 @api_view(['GET'])

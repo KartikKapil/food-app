@@ -52,8 +52,7 @@ def handle_uploaded_file(f, username):
 
     time_of_the_day = ['breakfast', 'lunch', 'dinner']
     user = User.objects.get(username=username)
-    student_name = user.student.name
-    student = Student.objects.get(name=student_name)
+    student = user.student
 
     for items in objects:
         i = 1
