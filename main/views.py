@@ -310,12 +310,12 @@ def make_transaction(request):
     url = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/transfers"
 
     data = {
-        "requestID": "testabcd",
+        "requestID": str(time.time()),
         "amount": {
             "currency": "INR",
             "amount": transfer_amount
         },
-        "transferCode": "A2A_VBOPayout-VBO2U_AUTH",
+        "transferCode": "A2A_P2P_AUTH",
         "debitAccountID": student.Account_ID,
         "creditAccountID": vendor.Account_ID,
         "transferTime": int(time.time()),
@@ -331,14 +331,20 @@ def make_transaction(request):
 
     response = requests.request("POST", url, headers=headers, data=payload)
     print(response.status_code)
+    print(response.json())
+    print(student.Account_ID)
+    print(vendor.Account_ID)
 
     # To test for a fake vendor change status code to 400
     if (response.status_code == 200):
         reciever = vendor_user
         Transcations(sender=request.user, reciever=reciever, amount=transfer_amount).save()
+        student.Account_Bal = student.Account_Bal - transfer_amount
+        print(student.Account_Bal)
+        student.save()
         return JsonResponse(response.status_code,safe=False)
 
-    return JsonResponse({'data': 'working'})
+    return JsonResponse({'status': 'failure'}, status=400)
 
 
 @api_view(['GET'])
@@ -360,7 +366,7 @@ def add_balance(request):
     url = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/transfers"
 
     data = {
-    "requestID": "exy",
+    "requestID": str(time.time()),
     "amount": {
         "currency": "INR",
         "amount": transfer_amount
@@ -379,6 +385,7 @@ def add_balance(request):
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
+    print(response.json())
 
     if(response.status_code==200):
         print("in  here")
