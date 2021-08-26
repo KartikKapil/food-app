@@ -17,13 +17,13 @@ class UserSerializer(serializers.ModelSerializer):
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        exclude = ('user', 'budget_spent', )
+        exclude = ('user', 'budget_spent','Account_Holder','Account_ID' )
 
 
 class VendorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vendor
-        exclude = ('user', )
+        exclude = ('user','Account_Holder','Account_ID')
 
 
 class UserSerializerWithToken(serializers.ModelSerializer):

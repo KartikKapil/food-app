@@ -138,11 +138,12 @@ def account_creation(request):
         "vectors": [
             {
             "type": "p",
-            "value": request.data.get("phone_no"),
+            "value": request.data.get("phone"),
             "isVerified": False
             }
         ]
     }
+    print(data)
     payload = json.dumps(data)
     headers = {
         'X-Zeta-AuthToken': 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwidGFnIjoiNGNfLWdmV3pFTGg2bWZrSzByQjhEdyIsImFsZyI6IkExMjhHQ01LVyIsIml2IjoiM0lQS2RuaEI4RU9yQVhKRyJ9.w80fhzwFm8GnnZ1spk26SxQ2yf-XqCctikmV8MLYVxc.GtomDrqhlBj_rX05elWovA.A1yTzH7PNo66evnIpUqg7AkeHmTFGUmSst7WPDannMJBWX9b7jQ2H1gvySYNNKh3RTj-KyBow-Iaw7hGLTDSuc8As0ri7oDbC20-WBKmNscbFqMk0sEeMZScNFl8CwD935JXkxhAuWW7yq1Cxfo715SUPHexXx2b69JEEbbfBSwAGOCoXkmTNz562m_UUx9uvW9LEl3i16m6pxRmrp-7beFBb9Wr5DXBT0MI6NNS-vmjtcAxS6e7G-Y8nu5cNCKcpkrvGd6bw1STYW5oGNUtcxJWGpu844CNyKHpiEEoO2OVMYW-DTBJQ3qXRu_EIlCBJy_UMa8cXeVoxSKud6mAcB_jZrrxDP_L7kcMuwZfMuXpiWh4gJH4UiR3uECy5sUm.5FPBMDVsRfrl9XKklFSHRw',
@@ -150,9 +151,12 @@ def account_creation(request):
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
+    response_data = response.json()
+    if not response.status_code == 200:
+        print(response_data)
+        return (None,None)
     # Bundle begin from here
     url_bundle = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/bundles/fee9ee2d-14d5-4f92-96f2-401b4da39325/issueBundle"
-    response_data = response.json()
     accountHolderID = response_data['individualID']
     name = "Kartik"
     data_bundle = {
@@ -163,11 +167,11 @@ def account_creation(request):
     }
     payload_bundle = json.dumps(data_bundle)
     response_bundle = requests.request("POST", url_bundle, headers=headers, data=payload_bundle)
-
+    response_bundle_data = response_bundle.json()
     if response_bundle.status_code == 200:
-        return accountHolderID
+        return (response_bundle_data['accounts'][0]['accountID'], accountHolderID)
     else:
-        return None
+        return (None, None)
 
 
 
@@ -184,8 +188,11 @@ def new_signup(request):
 
     # Save the data if Valid
     if user_serializer.is_valid() and student_serializer.is_valid():
+        accountID, accountHolderID  = account_creation(request)
+        if not accountID:
+            return JsonResponse({'status':'failure just like life'})
         user = user_serializer.save()
-        student_serializer.save(user=user)
+        student_serializer.save(user=user,Account_Holder=accountHolderID,Account_ID=accountID)
         get_restaurants(request.data["preferred_restaurants"], user.username)
         response = {
             "user": user_serializer.data,

@@ -15,7 +15,7 @@ class Student(models.Model):
     Account_ID = models.CharField(max_length=300)
     Account_Holder = models.CharField(max_length=300)
     address = models.CharField(max_length=300)
-    phone = models.CharField(max_length=11)
+    phone = models.CharField(max_length=14)
     budget_total = models.IntegerField(blank=False)
     budget_spent = models.IntegerField(blank=False, default=0)
     preferred_restaurants = models.TextField(null=False)
