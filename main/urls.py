@@ -15,5 +15,6 @@ urlpatterns = [
     path('change_budget_spent/', views.set_budget_spent),
     path('change_password/', views.change_password),
     path('get_all_transcation/', views.get_transactions),
-    path('make_transaction/',views.make_transaction)
+    path('make_transaction/',views.make_transaction),
+    path('get_preferred_vendors/',views.get_preferred_vendors)
 ]
