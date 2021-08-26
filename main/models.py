@@ -46,7 +46,7 @@ class Vendor(models.Model):
     latitude = models.FloatField(null=False)
 
 class Transcations(models.Model):
-    FROM  = models.ForeignKey(User, related_name='FROM',on_delete=models.CASCADE)
-    TO = models.ForeignKey(User, related_name='TO',on_delete=models.CASCADE)
-    AMOUNT = models.FloatField(blank=False)
-    DATE_TIME = models.DateTimeField(auto_now=True)
+    sender = models.ForeignKey(User, related_name='sender', on_delete=models.CASCADE)
+    reciever = models.ForeignKey(User, related_name='reciever', on_delete=models.CASCADE)
+    amount = models.FloatField(blank=False)
+    timestamp = models.DateTimeField(auto_now=True)

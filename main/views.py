@@ -1,3 +1,5 @@
+import requests
+
 from datetime import datetime
 
 from django.contrib import messages
@@ -229,3 +231,45 @@ def recommend(request):
     recommendation = recommend_dish(budget_total, budget_spent, restrs, dislikes, mess_menu)
 
     return JsonResponse(recommendation)
+
+# Transaction Endpoints
+
+@api_view(['POST'])
+def make_transaction(request):
+    ifiID = ""
+    X_Zeta_AuthToken = ""
+    amount = request.data.get("amount")
+    transferCode = ""
+    debitAccountID = request.user.accountID
+    creditAccountID = request.data.get("creditAccountID")
+
+    url = "https://api.preprod.zeta.in/api/v1/ifi/{ifiID}/transfers".format(ifiID)
+    data = {
+        "ifiID": ifiID,
+        "X-Zeta-AuthToken": X_Zeta_AuthToken,
+        "amount": {
+            "currency": "INR",
+            "amount": amount
+        },
+        "transferCode": transferCode,
+        "debitAccountID": debitAccountID,
+        "creditAccountID": creditAccountID,
+        "remarks": "TEST"
+    }
+
+    response = requests.post(url, data).json()
+
+    if (response["status"] == "SUCCESS"):
+        reciever = Vendor.objects.get(accountID = request.data.get("creditAccountID"))
+        Transcations(sender=request.user, reciever=reciever, amount=amount).save()
+        return JsonResponse(response)
+
+    return JsonResponse(response)
+    pass
+
+
+@api_view(['GET'])
+def get_transactions(request):
+    transactions = Transcations.objects.filter(reciever=request.user)
+    return JsonResponse(transactions)
+    pass
