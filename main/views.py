@@ -51,13 +51,13 @@ def user_create(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
 def closest_vendor(request):
     """ TO GET THE NEAREST VENDORS """
-    latitude_user = request.GET['latitude']
-    longitute_user = request.GET['longitude']
+    print(request.data)
+    latitude_user = request.data.get('latitude')
+    longitute_user = request.data.get('longitude')
     # CURRENTLY SET BY ME CAN BE ADJUSTED BY USER LATER
     raidus_of_action = 1000
     response = Distance_between_user_and_vendors(latitude_user, longitute_user, raidus_of_action)
@@ -112,6 +112,12 @@ def return_transcations(request):
     return Response(response)
 
 
+@api_view(['Get'])
+def return_preferred_vendors(request):
+    vendors_usernames = request.user.preferred_vendors
+    print(vendor_usernames)
+
+
 def account_creation(request):
 
     url = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/applications/newIndividual"
@@ -137,9 +143,9 @@ def account_creation(request):
         },
         "vectors": [
             {
-            "type": "p",
-            "value": request.data.get("phone"),
-            "isVerified": False
+                "type": "p",
+                "value": request.data.get("phone"),
+                "isVerified": False
             }
         ]
     }
@@ -154,7 +160,7 @@ def account_creation(request):
     response_data = response.json()
     if not response.status_code == 200:
         print(response_data)
-        return (None,None)
+        return (None, None)
     # Bundle begin from here
     url_bundle = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/bundles/fee9ee2d-14d5-4f92-96f2-401b4da39325/issueBundle"
     accountHolderID = response_data['individualID']
@@ -174,9 +180,6 @@ def account_creation(request):
         return (None, None)
 
 
-
-
-
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny, ))
 def new_signup(request):
@@ -188,11 +191,11 @@ def new_signup(request):
 
     # Save the data if Valid
     if user_serializer.is_valid() and student_serializer.is_valid():
-        accountID, accountHolderID  = account_creation(request)
+        accountID, accountHolderID = account_creation(request)
         if not accountID:
-            return JsonResponse({'status':'failure just like life'})
+            return JsonResponse({'status': 'failure just like life'})
         user = user_serializer.save()
-        student_serializer.save(user=user,Account_Holder=accountHolderID,Account_ID=accountID)
+        student_serializer.save(user=user, Account_Holder=accountHolderID, Account_ID=accountID)
         get_restaurants(request.data["preferred_restaurants"], user.username)
         response = {
             "user": user_serializer.data,
@@ -221,8 +224,11 @@ def new_vendor_signup(request):
     vendor_serializer = VendorSerializer(data=request.data)
 
     if user_serializer.is_valid() and vendor_serializer.is_valid():
+        accountID, accountHolderID = account_creation(request)
+        if not accountID:
+            return JsonResponse({'status': 'failure just like life'})
         user = user_serializer.save()
-        vendor_serializer.save(user=user)
+        vendor_serializer.save(user=user, Account_Holder=accountHolderID, Account_ID=accountID)
         response = {
             "user": user_serializer.data,
             "vendor": vendor_serializer.data
@@ -303,6 +309,7 @@ def recommend(request):
 
 # Transaction Endpoints
 
+
 @api_view(['POST'])
 def make_transaction(request):
     ifiID = ""
@@ -329,7 +336,7 @@ def make_transaction(request):
     response = requests.post(url, data).json()
 
     if (response["status"] == "SUCCESS"):
-        reciever = Vendor.objects.get(accountID = request.data.get("creditAccountID"))
+        reciever = Vendor.objects.get(accountID=request.data.get("creditAccountID"))
         Transcations(sender=request.user, reciever=reciever, amount=amount).save()
         return JsonResponse(response)
 

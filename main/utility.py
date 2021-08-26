@@ -98,7 +98,7 @@ def Distance_between_user_and_vendors(latitude_user,longitute_user,raidus_of_act
     Nearby_vendors = []
     for vendors in Vendors:
         vendor_latitude = vendors.latitude
-        vendor_longitute = vendors.longitute
+        vendor_longitute = vendors.longitude
         if(distance(latitude_user,vendor_latitude,longitute_user,vendor_longitute)<=raidus_of_action):
             Nearby_vendors.append({"id": vendors.user.username, "name": vendors.name})
 
