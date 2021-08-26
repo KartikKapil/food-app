@@ -95,9 +95,14 @@ def change_password(request):
 
 
 @api_view(['Get'])
-def return_preferred_vendors(request):
-    vendors_usernames = request.user.preferred_vendors
-    print(vendors_usernames)
+def get_preferred_vendors(request):
+    vendor_usernames = request.user.student.preferred_vendors.split(",")
+    vendor_users = User.objects.filter(username__in=vendor_usernames)
+    vendors = Vendor.objects.filter(user__in=vendor_users)
+    resp = {
+        "vendors": [{"username": v.user.username, "name": v.name} for v in list(vendors)]
+    }
+    return JsonResponse(resp, safe=False)
 
 
 def account_creation(request):
