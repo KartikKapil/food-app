@@ -1,7 +1,7 @@
 import requests
 import json
 from datetime import datetime
-
+import time
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
@@ -305,36 +305,44 @@ def recommend(request):
 
 @api_view(['POST'])
 def make_transaction(request):
-    ifiID = ""
-    X_Zeta_AuthToken = ""
-    amount = request.data.get("amount")
-    transferCode = ""
-    debitAccountID = request.user.accountID
-    creditAccountID = request.data.get("creditAccountID")
+    print(request.data.get('username'))
+    vendor_username = request.data.get('username')
+    vendor_user = User.objects.get(username=vendor_username)
+    vendor = Vendor.objects.get(user=vendor_user)
+    user = request.user
+    student = user.student
 
-    url = "https://api.preprod.zeta.in/api/v1/ifi/{ifiID}/transfers".format(ifiID)
+    url = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/transfers"
+    
     data = {
-        "ifiID": ifiID,
-        "X-Zeta-AuthToken": X_Zeta_AuthToken,
-        "amount": {
-            "currency": "INR",
-            "amount": amount
-        },
-        "transferCode": transferCode,
-        "debitAccountID": debitAccountID,
-        "creditAccountID": creditAccountID,
-        "remarks": "TEST"
+    "requestID": "testabcd",
+    "amount": {
+        "currency": "INR",
+        "amount": 10
+    },
+    "transferCode": "A2A_VBOPayout-VBO2U_AUTH",
+    "debitAccountID":student.Account_ID,
+    "creditAccountID": vendor.Account_ID,
+    "transferTime": int(time.time()),
+    "remarks": "Transaction"
     }
 
-    response = requests.post(url, data).json()
+    headers = {
+    'X-Zeta-AuthToken': 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwidGFnIjoiNGNfLWdmV3pFTGg2bWZrSzByQjhEdyIsImFsZyI6IkExMjhHQ01LVyIsIml2IjoiM0lQS2RuaEI4RU9yQVhKRyJ9.w80fhzwFm8GnnZ1spk26SxQ2yf-XqCctikmV8MLYVxc.GtomDrqhlBj_rX05elWovA.A1yTzH7PNo66evnIpUqg7AkeHmTFGUmSst7WPDannMJBWX9b7jQ2H1gvySYNNKh3RTj-KyBow-Iaw7hGLTDSuc8As0ri7oDbC20-WBKmNscbFqMk0sEeMZScNFl8CwD935JXkxhAuWW7yq1Cxfo715SUPHexXx2b69JEEbbfBSwAGOCoXkmTNz562m_UUx9uvW9LEl3i16m6pxRmrp-7beFBb9Wr5DXBT0MI6NNS-vmjtcAxS6e7G-Y8nu5cNCKcpkrvGd6bw1STYW5oGNUtcxJWGpu844CNyKHpiEEoO2OVMYW-DTBJQ3qXRu_EIlCBJy_UMa8cXeVoxSKud6mAcB_jZrrxDP_L7kcMuwZfMuXpiWh4gJH4UiR3uECy5sUm.5FPBMDVsRfrl9XKklFSHRw',
+    'Content-Type': 'application/json'
+    }
 
-    if (response["status"] == "SUCCESS"):
-        reciever = Vendor.objects.get(accountID = request.data.get("creditAccountID"))
-        Transcations(sender=request.user, reciever=reciever, amount=amount).save()
-        return JsonResponse(response)
+    payload = json.dumps(data)
 
-    return JsonResponse(response)
-    pass
+    response = requests.request("POST", url, headers=headers, data=payload)
+    print(response.status_code)
+
+    # if (response["status"] == "SUCCESS"):
+    #     reciever = Vendor.objects.get(accountID = request.data.get("creditAccountID"))
+    #     Transcations(sender=request.user, reciever=reciever, amount=amount).save()
+    #     return JsonResponse(response)
+
+    return JsonResponse({'data':'working'})
 
 
 @api_view(['GET'])
