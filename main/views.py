@@ -94,28 +94,10 @@ def change_password(request):
         return Response(response)
 
 
-@api_view(['POST'])
-def return_transcations(request):
-    username = request.POST.get('username')
-    user = User.objects.get(username=username)
-    all_transcation = Transcations.objects.filter(FROM=user)
-    transcation = []
-    for trans in all_transcation:
-        current_trans = []
-        current_trans.append(trans.TO.username)
-        current_trans.append(trans.AMOUNT)
-        current_trans.append(trans.DATE_TIME)
-        transcation.append(current_trans)
-
-    response = {"Transcations": transcation, 'code': status.HTTP_200_OK}
-
-    return Response(response)
-
-
 @api_view(['Get'])
 def return_preferred_vendors(request):
     vendors_usernames = request.user.preferred_vendors
-    print(vendor_usernames)
+    print(vendors_usernames)
 
 
 def account_creation(request):
@@ -312,8 +294,8 @@ def recommend(request):
 
 @api_view(['POST'])
 def make_transaction(request):
-    print(request.data.get('username'))
     vendor_username = request.data.get('username')
+    transfer_amount = request.data.get('amount')
     vendor_user = User.objects.get(username=vendor_username)
     vendor = Vendor.objects.get(user=vendor_user)
     user = request.user
@@ -325,7 +307,7 @@ def make_transaction(request):
     "requestID": "testabcd",
     "amount": {
         "currency": "INR",
-        "amount": 10
+        "amount": transfer_amount
     },
     "transferCode": "A2A_VBOPayout-VBO2U_AUTH",
     "debitAccountID":student.Account_ID,
@@ -344,10 +326,11 @@ def make_transaction(request):
     response = requests.request("POST", url, headers=headers, data=payload)
     print(response.status_code)
 
-    # if (response["status"] == "SUCCESS"):
-    #     reciever = Vendor.objects.get(accountID = request.data.get("creditAccountID"))
-    #     Transcations(sender=request.user, reciever=reciever, amount=amount).save()
-    #     return JsonResponse(response)
+    # To test for a fake vendor change status code to 400
+    if (response.status_code == 200):
+        reciever = vendor_user
+        Transcations(sender=request.user, reciever=reciever, amount=transfer_amount).save()
+        return JsonResponse(response.status_code,safe=False)
 
     return JsonResponse({'data':'working'})
 
@@ -355,5 +338,9 @@ def make_transaction(request):
 @api_view(['GET'])
 def get_transactions(request):
     transactions = Transcations.objects.filter(reciever=request.user)
-    return JsonResponse(transactions)
-    pass
+    res = []
+    for trans in transactions:
+        res.append({'Sender':trans.sender.username,'Date':trans.timestamp.date(),'Amount':trans.amount})
+    
+    data = {'Transactions':res}
+    return JsonResponse(data)

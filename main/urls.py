@@ -14,6 +14,6 @@ urlpatterns = [
     path('closest_vendors/', views.closest_vendor),
     path('change_budget_spent/', views.set_budget_spent),
     path('change_password/', views.change_password),
-    path('get_all_transcation/', views.return_transcations),
+    path('get_all_transcation/', views.get_transactions),
     path('make_transaction/',views.make_transaction)
 ]
