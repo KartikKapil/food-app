@@ -1,5 +1,5 @@
 import requests
-
+import json
 from datetime import datetime
 
 from django.contrib import messages
@@ -49,6 +49,7 @@ def user_create(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['GET'])
@@ -109,6 +110,67 @@ def return_transcations(request):
     response = {"Transcations": transcation, 'code': status.HTTP_200_OK}
 
     return Response(response)
+
+
+def account_creation(request):
+
+    url = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/applications/newIndividual"
+
+    data = {
+    "ifiID": "140793",
+    "individualType": "REAL",
+    "firstName": request.data.get("first_name"),
+    "lastName": request.data.get("last_name"),
+    "dob": {
+        "year": request.data.get("year"),
+        "month": request.data.get("month"),
+        "day": request.data.get("day")
+    },
+    "kycDetails": {
+        "kycStatus": "MINIMAL",
+        "kycStatusPostExpiry": "string",
+        "kycAttributes": {},
+        "authData": {
+        "PAN": request.data.get("PAN")
+        },
+        "authType": "PAN"
+    },
+    "vectors": [
+        {
+        "type": "p",
+        "value": request.data.get("phone_no"),
+        "isVerified": False
+        }
+    ]
+    }
+    payload = json.dumps(data)
+    headers = {
+    'X-Zeta-AuthToken': 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwidGFnIjoiNGNfLWdmV3pFTGg2bWZrSzByQjhEdyIsImFsZyI6IkExMjhHQ01LVyIsIml2IjoiM0lQS2RuaEI4RU9yQVhKRyJ9.w80fhzwFm8GnnZ1spk26SxQ2yf-XqCctikmV8MLYVxc.GtomDrqhlBj_rX05elWovA.A1yTzH7PNo66evnIpUqg7AkeHmTFGUmSst7WPDannMJBWX9b7jQ2H1gvySYNNKh3RTj-KyBow-Iaw7hGLTDSuc8As0ri7oDbC20-WBKmNscbFqMk0sEeMZScNFl8CwD935JXkxhAuWW7yq1Cxfo715SUPHexXx2b69JEEbbfBSwAGOCoXkmTNz562m_UUx9uvW9LEl3i16m6pxRmrp-7beFBb9Wr5DXBT0MI6NNS-vmjtcAxS6e7G-Y8nu5cNCKcpkrvGd6bw1STYW5oGNUtcxJWGpu844CNyKHpiEEoO2OVMYW-DTBJQ3qXRu_EIlCBJy_UMa8cXeVoxSKud6mAcB_jZrrxDP_L7kcMuwZfMuXpiWh4gJH4UiR3uECy5sUm.5FPBMDVsRfrl9XKklFSHRw',
+    'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    # Bundle begin from here 
+    url_bundle = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/bundles/fee9ee2d-14d5-4f92-96f2-401b4da39325/issueBundle"
+    response_data = response.json()
+    accountHolderID = response_data['individualID']
+    name = "Kartik"
+    data_bundle = {
+        "ifiID": "140793",
+        "accountHolderID":accountHolderID,
+        "name":name,
+        "phoneNumber":request.data.get("phone_no")
+    }
+    payload_bundle = json.dumps(data_bundle)
+    response_bundle = requests.request("POST", url_bundle, headers=headers, data=payload_bundle)
+    
+    if response_bundle.status_code == 200:
+        return accountHolderID
+    else:
+        return None
+
+
+
 
 
 @api_view(['POST'])
