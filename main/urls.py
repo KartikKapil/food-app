@@ -17,4 +17,5 @@ urlpatterns = [
     path('get_all_transcation/', views.get_transactions),
     path('make_transaction/',views.make_transaction),
     path('get_preferred_vendors/',views.get_preferred_vendors)
+    path('add_balance/',views.add_balance)
 ]
