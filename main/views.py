@@ -244,7 +244,8 @@ def make_transaction(request):
 
     reciever = vendor_user
     Transcations(sender=request.user, reciever=reciever, amount=transfer_amount).save()
-    student.= student.Account_Bal - transfer_amount
+    student.budget_total= student.budget_total - transfer_amount
+    student.buget_spent = transfer_amount
     student.save()
     return JsonResponse(200, safe=False)
 
@@ -265,41 +266,12 @@ def add_balance(request):
     transfer_amount = request.data.get('amount')
     user = request.user
     student = user.student
-
-    url = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/transfers"
-
-    data = {
-    "requestID": str(time.time()),
-    "amount": {
-        "currency": "INR",
-        "amount": transfer_amount
-    },
-    "transferCode": "A2A_VBOPayout-VBO2U_AUTH",
-    "debitAccountID": "181d2f04-f246-4022-9771-f571312e643a",
-    "creditAccountID": student.Account_ID,
-    "transferTime": int(time.time()),
-    "remarks": "TEST"
-    }
-
-    payload = json.dumps(data)
-    headers = {
-    'X-Zeta-AuthToken': 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwidGFnIjoiNGNfLWdmV3pFTGg2bWZrSzByQjhEdyIsImFsZyI6IkExMjhHQ01LVyIsIml2IjoiM0lQS2RuaEI4RU9yQVhKRyJ9.w80fhzwFm8GnnZ1spk26SxQ2yf-XqCctikmV8MLYVxc.GtomDrqhlBj_rX05elWovA.A1yTzH7PNo66evnIpUqg7AkeHmTFGUmSst7WPDannMJBWX9b7jQ2H1gvySYNNKh3RTj-KyBow-Iaw7hGLTDSuc8As0ri7oDbC20-WBKmNscbFqMk0sEeMZScNFl8CwD935JXkxhAuWW7yq1Cxfo715SUPHexXx2b69JEEbbfBSwAGOCoXkmTNz562m_UUx9uvW9LEl3i16m6pxRmrp-7beFBb9Wr5DXBT0MI6NNS-vmjtcAxS6e7G-Y8nu5cNCKcpkrvGd6bw1STYW5oGNUtcxJWGpu844CNyKHpiEEoO2OVMYW-DTBJQ3qXRu_EIlCBJy_UMa8cXeVoxSKud6mAcB_jZrrxDP_L7kcMuwZfMuXpiWh4gJH4UiR3uECy5sUm.5FPBMDVsRfrl9XKklFSHRw',
-    'Content-Type': 'application/json'
-    }
-
-    response = requests.request("POST", url, headers=headers, data=payload)
-    print(response.json())
-
-    if(response.status_code==200):
-        print("in  here")
-        student.Account_Bal = transfer_amount + student.Account_Bal
-        student.save()
-    # response_data = response.json()
-    # print("Response Data: ", response_data)
-    return JsonResponse({'status':response.status_code})
+    student.budget_total = student.budget_total + transfer_amount
+    student.save()
+    return JsonResponse({'status':'200'})
 
 @api_view(['Get'])
 def get_balance(request):
-    balance = request.user.student.Account_Bal
+    balance = request.user.student.budget_total
     data = {'Balance':balance}
     return JsonResponse(data)
