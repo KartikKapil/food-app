@@ -17,13 +17,13 @@ class UserSerializer(serializers.ModelSerializer):
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        exclude = ('user', 'budget_spent','Account_Holder','Account_ID' )
+        exclude = ('user', 'budget_spent')
 
 
 class VendorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vendor
-        exclude = ('user','Account_Holder','Account_ID')
+        exclude = ('user')
 
 
 class UserSerializerWithToken(serializers.ModelSerializer):
@@ -53,7 +53,7 @@ class UserSerializerWithToken(serializers.ModelSerializer):
         fields = ('token', 'username', 'password')
 
 class ChangePasswordSerializer(serializers.Serializer):
-    
+
     """
     Serializer for password change endpoint.
     """

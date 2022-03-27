@@ -121,11 +121,8 @@ def new_signup(request):
 
     # Save the data if Valid
     if user_serializer.is_valid() and student_serializer.is_valid():
-        accountID, accountHolderID = account_creation(request)
-        if not accountID:
-            return JsonResponse({'status': 'failure just like life'})
         user = user_serializer.save()
-        student_serializer.save(user=user, Account_Holder=accountHolderID, Account_ID=accountID)
+        student_serializer.save(user=user)
         get_restaurants(request.data["preferred_restaurants"], user.username)
         response = {
             "user": user_serializer.data,
@@ -154,11 +151,8 @@ def new_vendor_signup(request):
     vendor_serializer = VendorSerializer(data=request.data)
 
     if user_serializer.is_valid() and vendor_serializer.is_valid():
-        accountID, accountHolderID = account_creation(request)
-        if not accountID:
-            return JsonResponse({'status': 'failure just like life'})
         user = user_serializer.save()
-        vendor_serializer.save(user=user, Account_Holder=accountHolderID, Account_ID=accountID)
+        vendor_serializer.save(user=user)
         response = {
             "user": user_serializer.data,
             "vendor": vendor_serializer.data
@@ -250,7 +244,7 @@ def make_transaction(request):
 
     reciever = vendor_user
     Transcations(sender=request.user, reciever=reciever, amount=transfer_amount).save()
-    student.Account_Bal = student.Account_Bal - transfer_amount
+    student.= student.Account_Bal - transfer_amount
     student.save()
     return JsonResponse(200, safe=False)
 

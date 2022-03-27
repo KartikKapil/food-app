@@ -2,19 +2,13 @@ from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
-
-
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
-    PAN_number = models.CharField(max_length=200)
     DOB_date = models.IntegerField(blank=False)
     DOB_month = models.IntegerField(blank=False)
     DOB_year = models.IntegerField(blank=False)
-    Account_Bal = models.IntegerField(blank=False,default=0)
-    Account_ID = models.CharField(max_length=300)
-    Account_Holder = models.CharField(max_length=300)
     address = models.CharField(max_length=300)
     phone = models.CharField(max_length=14)
     budget_total = models.IntegerField(blank=False)
@@ -48,13 +42,9 @@ class Vendor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
-    PAN_number = models.CharField(max_length=200)
     DOB_date = models.IntegerField(blank=False)
     DOB_month = models.IntegerField(blank=False)
     DOB_year = models.IntegerField(blank=False)
-    Account_Bal = models.IntegerField(blank=False,default=0)
-    Account_ID = models.CharField(max_length=300)
-    Account_Holder = models.CharField(max_length=300)
     address = models.CharField(max_length=300)
     phone = models.IntegerField(default=False)
     price = models.IntegerField(default=False)
