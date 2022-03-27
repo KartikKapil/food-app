@@ -25,6 +25,7 @@ from .serializers import (
 from .utility import (
     Distance_between_user_and_vendors, get_restaurants, handle_uploaded_file
 )
+import uuid
 
 
 def not_loged_in(request):
@@ -106,66 +107,7 @@ def get_preferred_vendors(request):
 
 
 def account_creation(request):
-
-    url = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/applications/newIndividual"
-
-    data = {
-        "ifiID": "140793",
-        "individualType": "REAL",
-        "firstName": request.data.get("name"),
-        "lastName": request.data.get("last_name"),
-        "dob": {
-            "year": request.data.get("DOB_year"),
-            "month": request.data.get("DOB_month"),
-            "day": request.data.get("DOB_date")
-        },
-        "kycDetails": {
-            "kycStatus": "MINIMAL",
-            "kycStatusPostExpiry": "string",
-            "kycAttributes": {},
-            "authData": {
-                "PAN": request.data.get("PAN_number")
-            },
-            "authType": "PAN"
-        },
-        "vectors": [
-            {
-                "type": "p",
-                "value": request.data.get("phone"),
-                "isVerified": False
-            }
-        ]
-    }
-    print(data)
-    payload = json.dumps(data)
-    headers = {
-        'X-Zeta-AuthToken': 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwidGFnIjoiNGNfLWdmV3pFTGg2bWZrSzByQjhEdyIsImFsZyI6IkExMjhHQ01LVyIsIml2IjoiM0lQS2RuaEI4RU9yQVhKRyJ9.w80fhzwFm8GnnZ1spk26SxQ2yf-XqCctikmV8MLYVxc.GtomDrqhlBj_rX05elWovA.A1yTzH7PNo66evnIpUqg7AkeHmTFGUmSst7WPDannMJBWX9b7jQ2H1gvySYNNKh3RTj-KyBow-Iaw7hGLTDSuc8As0ri7oDbC20-WBKmNscbFqMk0sEeMZScNFl8CwD935JXkxhAuWW7yq1Cxfo715SUPHexXx2b69JEEbbfBSwAGOCoXkmTNz562m_UUx9uvW9LEl3i16m6pxRmrp-7beFBb9Wr5DXBT0MI6NNS-vmjtcAxS6e7G-Y8nu5cNCKcpkrvGd6bw1STYW5oGNUtcxJWGpu844CNyKHpiEEoO2OVMYW-DTBJQ3qXRu_EIlCBJy_UMa8cXeVoxSKud6mAcB_jZrrxDP_L7kcMuwZfMuXpiWh4gJH4UiR3uECy5sUm.5FPBMDVsRfrl9XKklFSHRw',
-        'Content-Type': 'application/json'
-    }
-
-    response = requests.request("POST", url, headers=headers, data=payload)
-    response_data = response.json()
-    print("Response Data: ", response_data)
-    if not response.status_code == 200:
-        print(response_data)
-        return (None, None)
-    # Bundle begin from here
-    url_bundle = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/bundles/fee9ee2d-14d5-4f92-96f2-401b4da39325/issueBundle"
-    accountHolderID = response_data['individualID']
-    name = "Kartik"
-    data_bundle = {
-        "ifiID": "140793",
-        "accountHolderID": accountHolderID,
-        "name": name,
-        "phoneNumber": request.data.get("phone_no")
-    }
-    payload_bundle = json.dumps(data_bundle)
-    response_bundle = requests.request("POST", url_bundle, headers=headers, data=payload_bundle)
-    response_bundle_data = response_bundle.json()
-    if response_bundle.status_code == 200:
-        return (response_bundle_data['accounts'][0]['accountID'], accountHolderID)
-    else:
-        return (None, None)
+    return uuid.uuid1(), uuid.uuid4()
 
 
 @api_view(['POST'])
@@ -297,7 +239,6 @@ def recommend(request):
 
 # Transaction Endpoints
 
-
 @api_view(['POST'])
 def make_transaction(request):
     vendor_username = request.data.get('username')
@@ -307,44 +248,11 @@ def make_transaction(request):
     user = request.user
     student = user.student
 
-    url = "https://fusion.preprod.zeta.in/api/v1/ifi/140793/transfers"
-
-    data = {
-        "requestID": str(time.time()),
-        "amount": {
-            "currency": "INR",
-            "amount": transfer_amount
-        },
-        "transferCode": "A2A_P2P_AUTH",
-        "debitAccountID": student.Account_ID,
-        "creditAccountID": vendor.Account_ID,
-        "transferTime": int(time.time()),
-        "remarks": "Transaction"
-    }
-
-    headers = {
-        'X-Zeta-AuthToken': 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwidGFnIjoiNGNfLWdmV3pFTGg2bWZrSzByQjhEdyIsImFsZyI6IkExMjhHQ01LVyIsIml2IjoiM0lQS2RuaEI4RU9yQVhKRyJ9.w80fhzwFm8GnnZ1spk26SxQ2yf-XqCctikmV8MLYVxc.GtomDrqhlBj_rX05elWovA.A1yTzH7PNo66evnIpUqg7AkeHmTFGUmSst7WPDannMJBWX9b7jQ2H1gvySYNNKh3RTj-KyBow-Iaw7hGLTDSuc8As0ri7oDbC20-WBKmNscbFqMk0sEeMZScNFl8CwD935JXkxhAuWW7yq1Cxfo715SUPHexXx2b69JEEbbfBSwAGOCoXkmTNz562m_UUx9uvW9LEl3i16m6pxRmrp-7beFBb9Wr5DXBT0MI6NNS-vmjtcAxS6e7G-Y8nu5cNCKcpkrvGd6bw1STYW5oGNUtcxJWGpu844CNyKHpiEEoO2OVMYW-DTBJQ3qXRu_EIlCBJy_UMa8cXeVoxSKud6mAcB_jZrrxDP_L7kcMuwZfMuXpiWh4gJH4UiR3uECy5sUm.5FPBMDVsRfrl9XKklFSHRw',
-        'Content-Type': 'application/json'
-    }
-
-    payload = json.dumps(data)
-
-    response = requests.request("POST", url, headers=headers, data=payload)
-    print(response.status_code)
-    print(response.json())
-    print(student.Account_ID)
-    print(vendor.Account_ID)
-
-    # To test for a fake vendor change status code to 400
-    if (response.status_code == 200):
-        reciever = vendor_user
-        Transcations(sender=request.user, reciever=reciever, amount=transfer_amount).save()
-        student.Account_Bal = student.Account_Bal - transfer_amount
-        print(student.Account_Bal)
-        student.save()
-        return JsonResponse(response.status_code,safe=False)
-
-    return JsonResponse({'status': 'failure'}, status=400)
+    reciever = vendor_user
+    Transcations(sender=request.user, reciever=reciever, amount=transfer_amount).save()
+    student.Account_Bal = student.Account_Bal - transfer_amount
+    student.save()
+    return JsonResponse(200, safe=False)
 
 
 @api_view(['GET'])
@@ -356,6 +264,7 @@ def get_transactions(request):
 
     data = {'Transactions':res}
     return JsonResponse(data)
+
 
 @api_view(['POST'])
 def add_balance(request):
