@@ -71,9 +71,13 @@ def set_budget_spent(request):
     user = request.user
     student = user.student
     new_budget_spent = student.budget_total - int(request.data.get('budget'))
-    student.budget_spent = new_budget_spent
+    student.budget_total = int(request.data.get('budget'))
+    student.budget_spent += new_budget_spent
     student.save()
-    return Response(status=200)
+    resp = {
+            "budget": student.budget_total
+    }
+    return JsonResponse(resp, safe=False)
 
 
 @api_view(['POST'])
@@ -219,7 +223,7 @@ def recommend(request):
 
     today = datetime.now().strftime("%w")
     try:
-        mess_menu = Menu.objects.get(student=student, day=today, time="lunch").dishes
+        mess_menu = Menu.objects.get(student=student, day=int(today)+1, time="lunch").dishes
     except ObjectDoesNotExist:
         # object does not exists
         return JsonResponse({'status': 'failure'}, status=404)
@@ -244,8 +248,8 @@ def make_transaction(request):
 
     reciever = vendor_user
     Transcations(sender=request.user, reciever=reciever, amount=transfer_amount).save()
-    student.budget_total= student.budget_total - transfer_amount
-    student.buget_spent = transfer_amount
+    student.budget_total = student.budget_total - transfer_amount
+    student.budget_spent += transfer_amount
     student.save()
     return JsonResponse(200, safe=False)
 
